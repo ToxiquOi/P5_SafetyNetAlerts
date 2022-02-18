@@ -13,9 +13,13 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>P5_SafetyNetAlerts</name>
     <description>P5_SafetyNetAlerts</description>
+
     <properties>
         <java.version>11</java.version>
+        <sonar.organization>toxiquoi</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
