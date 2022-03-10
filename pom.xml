@@ -15,7 +15,7 @@
     <description>P5_SafetyNetAlerts</description>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>16</java.version>
         <sonar.organization>toxiquoi</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
