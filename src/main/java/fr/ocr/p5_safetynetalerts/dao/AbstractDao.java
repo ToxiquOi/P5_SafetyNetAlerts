@@ -24,29 +24,29 @@ public abstract class AbstractDao<T extends AbstractModel> {
         this.entityName = entityName;
     }
 
-    protected T create(T obj) {
+    public T create(T obj) {
         return database.addElement(obj);
     }
 
-    protected T read(int id) throws DatabaseException, ElementNotFoundException {
+    public T read(int id) throws DatabaseException, ElementNotFoundException {
         Optional<T> opt = database.getElementById(cModel, id);
         if (opt.isEmpty())
             throw new ElementNotFoundException(StringUtils.capitalize(entityName) + "with id: " + id + ", not found in database");
         return opt.get();
     }
 
-    protected List<T> reads(Map<String, String> attributes) throws DatabaseException {
+    public List<T> reads(Map<String, String> attributes) throws DatabaseException {
         return database.getElement(cModel, attributes);
     }
 
-    protected T update(int id, Map<String, String> attributes) throws DatabaseException, ElementNotFoundException {
+    public T update(int id, Map<String, Object> attributes) throws DatabaseException, ElementNotFoundException {
         T result = database.updateElement(cModel, id, attributes);
         if (result == null)
             throw new ElementNotFoundException(StringUtils.capitalize(entityName) + "with id: " + id + ", not found in database");
         return result;
     }
 
-    protected boolean delete(int id) throws DatabaseException {
+    public boolean delete(int id) throws DatabaseException {
         return database.deleteElementById(cModel, id);
     }
 }

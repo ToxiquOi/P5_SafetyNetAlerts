@@ -3,31 +3,26 @@ package fr.ocr.p5_safetynetalerts.database;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.model.AbstractModel;
-import fr.ocr.p5_safetynetalerts.model.FirestationModel;
-import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
-import fr.ocr.p5_safetynetalerts.model.PersonModel;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-
+@Service
 public class Database {
 
     private static Database database;
 
+    private final Map<Class<? extends AbstractModel>, Integer> indexes = new HashMap<>();
     private final Map<Class<? extends AbstractModel>, List<AbstractModel>> data = new HashMap<>();
 
-    private  Database() {
-    }
 
-    public static Database getInstance() {
-        if(database == null) database = new Database();
-        return database;
+    private  Database() {
+        loadData(getClass().getClassLoader().getResourceAsStream("data.json"));
     }
 
     /**
@@ -54,8 +49,16 @@ public class Database {
      * @param <T> extends AbstractModel Type need to extend model
      */
     public <T extends AbstractModel> T addElement(T obj) {
-        if(!data.containsKey(obj.getClass())) data.put(obj.getClass(), new ArrayList<>());
-        obj.setId(data.get(obj.getClass()).size() + 1);
+        if(!data.containsKey(obj.getClass())) {
+            indexes.put(obj.getClass(), 0);
+            data.put(obj.getClass(), new ArrayList<>());
+        }
+
+        // Deported indexes handling
+        int newIndexes = indexes.get(obj.getClass()) + 1;
+        indexes.replace(obj.getClass(), newIndexes);
+
+        obj.setId(newIndexes);
         data.get(obj.getClass()).add(obj);
         return obj;
     }
@@ -83,22 +86,46 @@ public class Database {
      */
     public <T extends AbstractModel> List<T> getElement(Class<T> c, Map<String, String> attributes) throws DatabaseException {
         if(!data.containsKey(c)) throw new DatabaseException("Table not exist");
+        final List<Throwable> lEx = new ArrayList<>();
         List<AbstractModel> result = data.get(c)
             .stream()
             .filter(model -> {
-                boolean isFinded = false;
+                boolean isFinded = true;
                 for (Map.Entry<String, String> attr : attributes.entrySet()) {
                     try {
-                        Method m = c.getMethod("get" + StringUtils.capitalize(attr.getKey()));
-                        isFinded = m.invoke(model).toString().contains(attr.getValue());
-                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                        // TODO: Need refactor to better handling of exceptions ?
-                        e.printStackTrace();
+                        Optional<Method> m = searchMethod("get" + attr.getKey().toLowerCase(), c) ;
+
+                        if(m.isPresent()) {
+                            if(m.get().getReturnType().equals(List.class))
+                                isFinded &= ((List<?>) m.get()
+                                        .invoke(model))
+                                        .stream()
+                                        .anyMatch(s -> s.equals(attr.getValue()));
+                            else
+                                isFinded &= m.get()
+                                        .invoke(model)
+                                        .toString()
+                                        .contains(attr.getValue());
+                        }
+                    } catch (InvocationTargetException | IllegalAccessException e) {
+                        lEx.add(e);
+                        isFinded = false;
+                        break;
                     }
                 }
                 return isFinded;
             }).toList();
 
+        // Handling error
+        if (result.isEmpty() && !lEx.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            lEx.forEach(ex -> {
+                sb.append(ex.getLocalizedMessage());
+                sb.append("\n");
+            });
+
+            throw new DatabaseException("Error during data processing, " + sb);
+        }
 
         return (List<T>) result;
     }
@@ -112,7 +139,7 @@ public class Database {
      * @return Updated element
      * @throws DatabaseException if DB table not exist or if an error occured during the field update
      */
-    public <T extends AbstractModel> T updateElement(Class<T> c, int id, Map<String, String> attributes) throws DatabaseException {
+    public <T extends AbstractModel> T updateElement(Class<T> c, int id, Map<String, Object> attributes) throws DatabaseException {
         if(!data.containsKey(c)) throw new DatabaseException("Table not exist");
 
         Optional<T> toUpdate = getElementById(c, id);
@@ -120,11 +147,12 @@ public class Database {
         if(toUpdate.isEmpty()) return null;
 
         T element = toUpdate.get();
-        for (Map.Entry<String, String> attr : attributes.entrySet()) {
+        for (Map.Entry<String, Object> attr : attributes.entrySet()) {
             try {
-                Method m = c.getMethod("set" + StringUtils.capitalize(attr.getKey()), String.class);
-                m.invoke(element, attr.getValue());
-            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                Optional<Method> m = searchMethod("set" + StringUtils.capitalize(attr.getKey().toLowerCase()), c, String.class);
+                if(m.isPresent()) m.get().invoke(element, attr.getValue());
+
+            } catch (InvocationTargetException | IllegalAccessException e) {
                 throw new DatabaseException("Error during update", e);
             }
         }
@@ -142,16 +170,7 @@ public class Database {
      */
     public <T extends AbstractModel> boolean deleteElementById(Class<T> c, int id) throws DatabaseException {
         if(!data.containsKey(c)) throw new DatabaseException("Table not exist");
-        boolean result = false;
-
-        Optional<T> toDelete = getElementById(c, id);
-
-        if(toDelete.isPresent()) {
-            data.get(c).remove(toDelete.get());
-            result = true;
-        }
-
-        return result;
+        return data.get(c).removeIf(m -> m.getId() == id);
     }
 
     public <T extends AbstractModel> int countElementInTable(Class<T> c) {
@@ -160,5 +179,17 @@ public class Database {
 
     public void truncate() {
         data.clear();
+    }
+
+    private Optional<Method> searchMethod(String name, Class<?> c) {
+        return Arrays.stream(c.getMethods())
+                .filter(mSearched -> mSearched.getName().equalsIgnoreCase(name))
+                .findFirst();
+    }
+
+    private Optional<Method> searchMethod(String name, Class<?> c, Class<?>... args) {
+        return Arrays.stream(c.getMethods())
+                .filter(mSearched -> mSearched.getName().equalsIgnoreCase(name) && Arrays.equals(mSearched.getParameterTypes(), args))
+                .findFirst();
     }
 }
