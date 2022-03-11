@@ -20,20 +20,24 @@ public class DatabaseTest {
     @Autowired
     private Database db;
 
-    @AfterEach
-    private void AfterPerTest() {
-        db.truncate();
+    @BeforeEach
+    private void BeforePerTest() {
         db.loadData(getClass().getClassLoader().getResourceAsStream("data.json"));
     }
 
+    @AfterEach
+    private void AfterPerTest() {
+        db.truncate();
+    }
+
     @Test
-    public void testCountElement() {
+    public void testCountElement() throws DatabaseException {
         Assertions.assertEquals(13, db.countElementInTable(FirestationModel.class));
     }
 
     @Test
     @Order(1)
-    public void testAddElement() {
+    public void testAddElement() throws DatabaseException {
         FirestationModel fm = new FirestationModel("test", "2");
         db.addElement(fm);
 
@@ -94,6 +98,7 @@ public class DatabaseTest {
 
         Optional<FirestationModel> updated = db.getElementById(FirestationModel.class, fm.getId());
 
+        Assertions.assertTrue(updated.isPresent());
         Assertions.assertEquals("666", updated.get().getStation());
         Assertions.assertEquals("test2", updated.get().getAddress());
     }
