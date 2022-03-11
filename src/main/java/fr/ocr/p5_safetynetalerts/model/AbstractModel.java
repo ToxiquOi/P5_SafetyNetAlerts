@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AbstractModel {
+public abstract class AbstractModel {
     private int id;
 }

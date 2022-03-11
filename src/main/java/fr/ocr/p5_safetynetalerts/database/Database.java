@@ -6,28 +6,26 @@ import fr.ocr.p5_safetynetalerts.model.AbstractModel;
 import fr.ocr.p5_safetynetalerts.model.FirestationModel;
 import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-
+@Service
 public class Database {
 
     private static Database database;
 
+    private final Map<Class<? extends AbstractModel>, Integer> indexes = new HashMap<>();
     private final Map<Class<? extends AbstractModel>, List<AbstractModel>> data = new HashMap<>();
 
-    private  Database() {
-    }
 
-    public static Database getInstance() {
-        if(database == null) database = new Database();
-        return database;
+    private  Database() {
+        loadData(getClass().getClassLoader().getResourceAsStream("data.json"));
     }
 
     /**
@@ -40,8 +38,13 @@ public class Database {
         ObjectMapper mapper = new ObjectMapper();
         try {
             ImportDataModel dataModel = mapper.readValue(is, ImportDataModel.class);
+            this.initializeTable(PersonModel.class);
             dataModel.persons.forEach(this::addElement);
+
+            this.initializeTable(FirestationModel.class);
             dataModel.firestations.forEach(this::addElement);
+
+            this.initializeTable(MedicalRecordModel.class);
             dataModel.medicalrecords.forEach(this::addElement);
         } catch (IOException e) {
             e.printStackTrace();
@@ -54,8 +57,11 @@ public class Database {
      * @param <T> extends AbstractModel Type need to extend model
      */
     public <T extends AbstractModel> T addElement(T obj) {
-        if(!data.containsKey(obj.getClass())) data.put(obj.getClass(), new ArrayList<>());
-        obj.setId(data.get(obj.getClass()).size() + 1);
+        // Deported indexes handling
+        int newIndexes = indexes.get(obj.getClass()) + 1;
+        indexes.replace(obj.getClass(), newIndexes);
+
+        obj.setId(newIndexes);
         data.get(obj.getClass()).add(obj);
         return obj;
     }
@@ -83,22 +89,28 @@ public class Database {
      */
     public <T extends AbstractModel> List<T> getElement(Class<T> c, Map<String, String> attributes) throws DatabaseException {
         if(!data.containsKey(c)) throw new DatabaseException("Table not exist");
+        final List<Throwable> throwables = new ArrayList<>();
+
         List<AbstractModel> result = data.get(c)
             .stream()
             .filter(model -> {
-                boolean isFinded = false;
+                boolean isFinded = true;
                 for (Map.Entry<String, String> attr : attributes.entrySet()) {
-                    try {
-                        Method m = c.getMethod("get" + StringUtils.capitalize(attr.getKey()));
-                        isFinded = m.invoke(model).toString().contains(attr.getValue());
-                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                        // TODO: Need refactor to better handling of exceptions ?
-                        e.printStackTrace();
-                    }
+                    isFinded = invokeMatchingHandler(c, isFinded, model, attr, throwables);
                 }
                 return isFinded;
             }).toList();
 
+        // Handling error
+        if (result.isEmpty() && !throwables.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            throwables.forEach(ex -> {
+                sb.append(ex.getLocalizedMessage());
+                sb.append("\n");
+            });
+
+            throw new DatabaseException("Error during data processing, " + sb);
+        }
 
         return (List<T>) result;
     }
@@ -112,7 +124,7 @@ public class Database {
      * @return Updated element
      * @throws DatabaseException if DB table not exist or if an error occured during the field update
      */
-    public <T extends AbstractModel> T updateElement(Class<T> c, int id, Map<String, String> attributes) throws DatabaseException {
+    public <T extends AbstractModel> T updateElement(Class<T> c, int id, Map<String, Object> attributes) throws DatabaseException {
         if(!data.containsKey(c)) throw new DatabaseException("Table not exist");
 
         Optional<T> toUpdate = getElementById(c, id);
@@ -120,11 +132,12 @@ public class Database {
         if(toUpdate.isEmpty()) return null;
 
         T element = toUpdate.get();
-        for (Map.Entry<String, String> attr : attributes.entrySet()) {
+        for (Map.Entry<String, Object> attr : attributes.entrySet()) {
             try {
-                Method m = c.getMethod("set" + StringUtils.capitalize(attr.getKey()), String.class);
-                m.invoke(element, attr.getValue());
-            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                Optional<Method> m = searchMethod("set" + StringUtils.capitalize(attr.getKey().toLowerCase()), c, String.class);
+                if(m.isPresent()) m.get().invoke(element, attr.getValue());
+
+            } catch (InvocationTargetException | IllegalAccessException e) {
                 throw new DatabaseException("Error during update", e);
             }
         }
@@ -142,23 +155,87 @@ public class Database {
      */
     public <T extends AbstractModel> boolean deleteElementById(Class<T> c, int id) throws DatabaseException {
         if(!data.containsKey(c)) throw new DatabaseException("Table not exist");
-        boolean result = false;
-
-        Optional<T> toDelete = getElementById(c, id);
-
-        if(toDelete.isPresent()) {
-            data.get(c).remove(toDelete.get());
-            result = true;
-        }
-
-        return result;
+        return data.get(c).removeIf(m -> m.getId() == id);
     }
 
-    public <T extends AbstractModel> int countElementInTable(Class<T> c) {
+    public <T extends AbstractModel> int countElementInTable(Class<T> c) throws DatabaseException {
+        if(!data.containsKey(c)) throw new DatabaseException("Table not exist");
         return data.get(c).size();
+    }
+
+    public <T extends AbstractModel> void initializeTable(Class<T> c) {
+        if(!data.containsKey(c)) {
+            indexes.put(c, 0);
+            data.put(c, new ArrayList<>());
+        }
     }
 
     public void truncate() {
         data.clear();
+    }
+
+    /**
+     * Search a method in a class
+     * @param name method searched
+     * @param c class containing method
+     * @return An Optional<Method> object
+     */
+    private Optional<Method> searchMethod(String name, Class<?> c) {
+        return Arrays.stream(c.getMethods())
+                .filter(mSearched -> mSearched.getName().equalsIgnoreCase(name))
+                .findFirst();
+    }
+
+    /**
+     * Search a method in a class
+     * @param name method searched
+     * @param c class containing method
+     * @param args argument types of the seached method
+     * @return An Optional<Method> object
+     */
+    private Optional<Method> searchMethod(String name, Class<?> c, Class<?>... args) {
+        return Arrays.stream(c.getMethods())
+                .filter(mSearched -> mSearched.getName().equalsIgnoreCase(name) && Arrays.equals(mSearched.getParameterTypes(), args))
+                .findFirst();
+    }
+
+
+    private boolean invokeMatchingHandler(Class<?> c, boolean isFinded, AbstractModel model, Map.Entry<String, String> entry, List<Throwable> throwables) {
+        try {
+            Optional<Method> m = searchMethod("get" + entry.getKey().toLowerCase(), c) ;
+            if(m.isPresent())
+                isFinded = invokeMatchingMethod(m.get(), isFinded, model, entry.getValue());
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throwables.add(e);
+            isFinded = false;
+        }
+
+        return isFinded;
+    }
+
+    /**
+     * Method used to match a value stored in an AbstractModel,
+     * this method is able to match a value in a String Type or a List
+     * @param m Method to invoke
+     * @param isFinded A flag setted after invoking method
+     * @param model AbstractModel inherited instance containing the method 'm'
+     * @param valueToMatch The value we need to match in an object
+     * @return true if the parameter isFinded is true and the value searched is Matched
+     * @throws InvocationTargetException Invoking error
+     * @throws IllegalAccessException Illegal access to a method
+     */
+    private boolean invokeMatchingMethod(Method m, boolean isFinded, AbstractModel model, String valueToMatch) throws InvocationTargetException, IllegalAccessException {
+        if(m.getReturnType().equals(List.class))
+            isFinded &= ((List<?>) m
+                    .invoke(model))
+                    .stream()
+                    .anyMatch(s -> s.equals(valueToMatch));
+        else
+            isFinded &= m
+                    .invoke(model)
+                    .toString()
+                    .contains(valueToMatch);
+
+        return isFinded;
     }
 }
