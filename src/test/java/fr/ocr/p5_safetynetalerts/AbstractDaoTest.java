@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SpringBootTest
-public class AbstractDaoTest {
+class AbstractDaoTest {
 
     @Autowired
     private Database db;

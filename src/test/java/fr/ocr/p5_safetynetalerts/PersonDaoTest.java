@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SpringBootTest
-public class PersonDaoTest {
+class PersonDaoTest {
 
     @Autowired
     private Database db;

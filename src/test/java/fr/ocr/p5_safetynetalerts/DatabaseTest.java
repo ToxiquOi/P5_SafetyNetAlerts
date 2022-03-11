@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @SpringBootTest
-public class DatabaseTest {
+class DatabaseTest {
 
     @Autowired
     private Database db;
@@ -30,12 +30,12 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testCountElement() throws DatabaseException {
+    void testCountElement() throws DatabaseException {
         Assertions.assertEquals(13, db.countElementInTable(FirestationModel.class));
     }
 
     @Test
-    public void testAddElement() throws DatabaseException {
+    void testAddElement() throws DatabaseException {
         FirestationModel fm = new FirestationModel("test", "2");
         db.addElement(fm);
 
@@ -43,14 +43,14 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testGetElementById() throws DatabaseException {
+    void testGetElementById() throws DatabaseException {
         Optional<FirestationModel> rs = db.getElementById(FirestationModel.class, 1);
 
         Assertions.assertTrue(rs.isPresent());
     }
 
     @Test
-    public void testGetElementOneAttribute() throws DatabaseException {
+    void testGetElementOneAttribute() throws DatabaseException {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("allergies", "nillacilan");
 
@@ -60,7 +60,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testGetElementMultipleAttribute() throws DatabaseException {
+    void testGetElementMultipleAttribute() throws DatabaseException {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("firstName", "Ron");
         attributes.put("lastName", "Peters");
@@ -70,7 +70,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testDeleteElementById() throws DatabaseException {
+    void testDeleteElementById() throws DatabaseException {
         int before = db.countElementInTable(FirestationModel.class);
         db.deleteElementById(FirestationModel.class, 2);
         int after = db.countElementInTable(FirestationModel.class);
@@ -79,7 +79,7 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testUpdateElementMultipleAttribute() throws DatabaseException {
+    void testUpdateElementMultipleAttribute() throws DatabaseException {
         FirestationModel fm = new FirestationModel("test", "666");
         db.addElement(fm);
 
