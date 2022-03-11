@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @SpringBootTest
-@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class DatabaseTest {
 
     @Autowired
@@ -36,7 +35,6 @@ public class DatabaseTest {
     }
 
     @Test
-    @Order(1)
     public void testAddElement() throws DatabaseException {
         FirestationModel fm = new FirestationModel("test", "2");
         db.addElement(fm);
@@ -45,7 +43,6 @@ public class DatabaseTest {
     }
 
     @Test
-    @Order(2)
     public void testGetElementById() throws DatabaseException {
         Optional<FirestationModel> rs = db.getElementById(FirestationModel.class, 1);
 
@@ -53,7 +50,6 @@ public class DatabaseTest {
     }
 
     @Test
-    @Order(5)
     public void testGetElementOneAttribute() throws DatabaseException {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("allergies", "nillacilan");
@@ -64,7 +60,6 @@ public class DatabaseTest {
     }
 
     @Test
-    @Order(4)
     public void testGetElementMultipleAttribute() throws DatabaseException {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("firstName", "Ron");
@@ -75,7 +70,6 @@ public class DatabaseTest {
     }
 
     @Test
-    @Order(3)
     public void testDeleteElementById() throws DatabaseException {
         int before = db.countElementInTable(FirestationModel.class);
         db.deleteElementById(FirestationModel.class, 2);

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SpringBootTest
-@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class AbstractDaoTest {
 
     @Autowired
