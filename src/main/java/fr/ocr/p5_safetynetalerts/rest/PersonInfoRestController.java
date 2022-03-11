@@ -5,6 +5,7 @@ import fr.ocr.p5_safetynetalerts.dao.PersonDao;
 import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
+import fr.ocr.p5_safetynetalerts.utils.YearsOldCalculatorUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,14 +51,11 @@ public class PersonInfoRestController {
         String key = medicalRecordModel.getFirstName() + " " + medicalRecordModel.getLastName();
 
         //Calcul age
-        String[] splitBirthdate = medicalRecordModel.getBirthdate().split("/");
-        Period p = Period.between(LocalDate.of(Integer.parseInt(splitBirthdate[2]),
-                Integer.parseInt(splitBirthdate[1]),
-                Integer.parseInt(splitBirthdate[0])), LocalDate.now());
+        int yearsOld = YearsOldCalculatorUtils.caculateYearsOld(medicalRecordModel.getBirthdate());
 
         //Prepare response contents
         Map<String, Object> value = new HashMap<>();
-        value.put("age", p.getYears());
+        value.put("age", yearsOld);
         value.put("address", personModel.getAddress());
         value.put("mail", personModel.getEmail());
         value.put("allergies", medicalRecordModel.getAllergies());

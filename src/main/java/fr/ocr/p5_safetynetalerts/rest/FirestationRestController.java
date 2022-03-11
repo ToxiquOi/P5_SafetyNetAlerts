@@ -1,26 +1,36 @@
 package fr.ocr.p5_safetynetalerts.rest;
 
 import fr.ocr.p5_safetynetalerts.dao.FireStationDao;
+import fr.ocr.p5_safetynetalerts.dao.MedicalRecordDao;
+import fr.ocr.p5_safetynetalerts.dao.PersonDao;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.FirestationModel;
+import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
+import fr.ocr.p5_safetynetalerts.utils.YearsOldCalculatorUtils;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 @RestController
 @RequestMapping("firestation")
 public class FirestationRestController {
 
     private final FireStationDao fireStationDao;
+    private final PersonDao personDao;
+    private final MedicalRecordDao medicalRecordDao;
 
     @Autowired
-    public FirestationRestController(FireStationDao fireStationDao) {
+    public FirestationRestController(FireStationDao fireStationDao, PersonDao personDao, MedicalRecordDao medicalRecordDao) {
         this.fireStationDao = fireStationDao;
+        this.personDao = personDao;
+        this.medicalRecordDao = medicalRecordDao;
     }
 
     @PostMapping
@@ -43,15 +53,43 @@ public class FirestationRestController {
         return ResponseEntity.ok(null);
     }
 
-    @GetMapping()
+    @SneakyThrows
+    @GetMapping
     public ResponseEntity<ResponseModel> getPersonCoveredByFirestation(@RequestParam String stationNumber) {
-        /* TODO
-            FireStation: number -> address
-            Person: address -> nom, prenom, tel
-            Stats: nbAdulte, nbEnfant
-         */
+        Map<String, String> attr = new HashMap<>();
+        attr.put("station", stationNumber);
 
-        return ResponseEntity.ok(null);
+        ResponseModel rsModel = new ResponseModel();
+        int nbAdult = 0;
+        int nbChild = 0;
+
+
+        for(FirestationModel station : fireStationDao.reads(attr)) {
+            attr.clear();
+            attr.put("address", station.getAddress());
+
+            Map<Integer, Object> persons = new TreeMap<>();
+            for(PersonModel personModel : personDao.reads(attr)) {
+                Map<String, String> person = new TreeMap<>();
+                person.put("lastname", personModel.getLastName());
+                person.put("firstname", personModel.getFirstName());
+
+                if (18 > YearsOldCalculatorUtils.caculateYearsOld(medicalRecordDao.reads(person).get(0).getBirthdate()))
+                    nbChild++;
+                else
+                    nbAdult++;
+
+                person.put("phone", personModel.getPhone());
+                persons.put(personModel.getId(), person);
+            }
+
+            rsModel.put(station.getAddress(), persons);
+        }
+
+        rsModel.put("childs", nbChild);
+        rsModel.put("Adults", nbAdult);
+
+        return ResponseEntity.ok(rsModel);
     }
 
     @ExceptionHandler(ElementNotFoundException.class)
