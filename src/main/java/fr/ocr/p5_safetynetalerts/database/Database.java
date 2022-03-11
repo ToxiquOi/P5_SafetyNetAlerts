@@ -18,8 +18,6 @@ import java.util.*;
 @Service
 public class Database {
 
-    private static Database database;
-
     private final Map<Class<? extends AbstractModel>, Integer> indexes = new HashMap<>();
     private final Map<Class<? extends AbstractModel>, List<AbstractModel>> data = new HashMap<>();
 
