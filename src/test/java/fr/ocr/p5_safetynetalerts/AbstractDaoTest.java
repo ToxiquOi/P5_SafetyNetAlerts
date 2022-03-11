@@ -65,4 +65,34 @@ public class AbstractDaoTest {
 
         Assertions.assertThrows(ElementNotFoundException.class, () -> daoTestImp.update(2, attributes));
     }
+
+    @Test
+    void testReadThrowElementNotFound() {
+        Assertions.assertThrows(ElementNotFoundException.class, () -> daoTestImp.read(1));
+    }
+
+    @Test
+    void testDeleteElement() throws DatabaseException, ElementNotFoundException {
+        AbstractModelTestImp model = new AbstractModelTestImp();
+        model.setValue("test");
+        daoTestImp.create(model);
+
+        Assertions.assertEquals(1, db.countElementInTable(AbstractModelTestImp.class));
+        daoTestImp.delete(1);
+        Assertions.assertEquals(0, db.countElementInTable(AbstractModelTestImp.class));
+    }
+
+    @Test
+    void testDeleteThrowElementNotFound() {
+        Assertions.assertThrows(ElementNotFoundException.class, () -> daoTestImp.delete(1));
+    }
+
+    @Test
+    void testGetElement() throws DatabaseException {
+        AbstractModelTestImp model = new AbstractModelTestImp();
+        model.setValue("test");
+        daoTestImp.create(model);
+
+        Assertions.assertEquals(model, daoTestImp.reads(new HashMap<>()).get(0));
+    }
 }
