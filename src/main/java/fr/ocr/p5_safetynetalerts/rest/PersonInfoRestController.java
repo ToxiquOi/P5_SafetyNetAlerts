@@ -1,0 +1,70 @@
+package fr.ocr.p5_safetynetalerts.rest;
+
+import fr.ocr.p5_safetynetalerts.dao.MedicalRecordDao;
+import fr.ocr.p5_safetynetalerts.dao.PersonDao;
+import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
+import fr.ocr.p5_safetynetalerts.model.PersonModel;
+import fr.ocr.p5_safetynetalerts.model.ResponseModel;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("personInfo")
+public class PersonInfoRestController {
+
+    private final MedicalRecordDao medicalRecordDao;
+    private final PersonDao personDao;
+
+    @Autowired
+    public PersonInfoRestController(MedicalRecordDao medicalRecordDao, PersonDao personDao) {
+        this.medicalRecordDao = medicalRecordDao;
+        this.personDao = personDao;
+    }
+
+    @SneakyThrows
+    @GetMapping
+    public ResponseEntity<ResponseModel> getMedicalRecordFromFirstNameAndLastName(@RequestParam(name = "FirstName") String firstname,
+                                                                                  @RequestParam(name = "LastName") String lastname) {
+        Map<String, String> attributes = new HashMap<>();
+        attributes.put("firstname", firstname);
+        attributes.put("lastname", lastname);
+
+        PersonModel personModel = personDao.reads(attributes).get(0);
+        MedicalRecordModel medicalRecordModel = medicalRecordDao.reads(attributes).get(0);
+
+        ResponseModel rsModel = new ResponseModel();
+        String key = medicalRecordModel.getFirstName() + " " + medicalRecordModel.getLastName();
+
+        //Calcul age
+        String[] splitBirthdate = medicalRecordModel.getBirthdate().split("/");
+        Period p = Period.between(LocalDate.of(Integer.parseInt(splitBirthdate[2]),
+                Integer.parseInt(splitBirthdate[1]),
+                Integer.parseInt(splitBirthdate[0])), LocalDate.now());
+
+        //Prepare response contents
+        Map<String, Object> value = new HashMap<>();
+        value.put("age", p.getYears());
+        value.put("address", personModel.getAddress());
+        value.put("mail", personModel.getEmail());
+        value.put("allergies", medicalRecordModel.getAllergies());
+        value.put("medications", medicalRecordModel.getMedications());
+
+        rsModel.put(key, value);
+
+        return ResponseEntity.ok(rsModel);
+    }
+}
