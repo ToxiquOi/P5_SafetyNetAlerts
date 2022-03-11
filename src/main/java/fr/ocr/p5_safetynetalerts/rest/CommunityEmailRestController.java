@@ -16,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("communityEmail")
-public class CommunityEmailRestController {
+public class CommunityEmailRestController extends AbstractRestExceptionHandler {
     private final PersonDao personDao;
 
     @Autowired
@@ -43,15 +43,5 @@ public class CommunityEmailRestController {
 
         rsModel.put(cityName, rsContents);
         return ResponseEntity.ok(rsModel);
-    }
-
-    @ExceptionHandler(ElementNotFoundException.class)
-    public ResponseEntity<ElementNotFoundException> handleElementNotFound(ElementNotFoundException ex) {
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<Void> handleDatabaseException(DatabaseException ex) {
-        return ResponseEntity.unprocessableEntity().build();
     }
 }

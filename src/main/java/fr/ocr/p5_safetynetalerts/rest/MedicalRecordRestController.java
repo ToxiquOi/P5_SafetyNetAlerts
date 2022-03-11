@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("medicalRecord")
-public class MedicalRecordRestController {
+public class MedicalRecordRestController extends AbstractRestExceptionHandler {
 
     private final MedicalRecordDao medicalRecordDao;
 
@@ -41,15 +41,5 @@ public class MedicalRecordRestController {
                                              @RequestParam(name = "LastName") String lastname) {
         medicalRecordDao.deleteByFirstNameAndLastName(firstname, lastname);
         return ResponseEntity.ok().build();
-    }
-
-    @ExceptionHandler(ElementNotFoundException.class)
-    public ResponseEntity<Void> handleElementNotFound(ElementNotFoundException ex) {
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<Void> handleDatabaseException(DatabaseException ex) {
-        return ResponseEntity.unprocessableEntity().build();
     }
 }

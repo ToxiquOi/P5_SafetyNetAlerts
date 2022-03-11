@@ -25,7 +25,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("personInfo")
-public class PersonInfoRestController {
+public class PersonInfoRestController extends AbstractRestExceptionHandler {
 
     private final MedicalRecordDao medicalRecordDao;
     private final PersonDao personDao;

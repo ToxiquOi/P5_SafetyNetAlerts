@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("alert")
-public class AlertRestController {
+public class AlertRestController extends AbstractRestExceptionHandler {
 
-    @GetMapping("/childAlert")
+    @GetMapping("/child")
     public ResponseEntity<ResponseModel> childAlert(@RequestParam String address) {
         /* TODO
            Person : address
@@ -23,7 +23,7 @@ public class AlertRestController {
         return ResponseEntity.ok(null);
     }
 
-    @GetMapping("/phoneAlert")
+    @GetMapping("/phone")
     public ResponseEntity<ResponseModel> phoneAlert(@RequestParam String firestationNumber) {
         /*
             TODO
@@ -34,6 +34,4 @@ public class AlertRestController {
 
         return ResponseEntity.ok(null);
     }
-
-    //TODO: NotFoundHandler
 }

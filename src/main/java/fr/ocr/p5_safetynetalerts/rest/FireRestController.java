@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("fire")
-public class FireRestController {
+public class FireRestController extends AbstractRestExceptionHandler {
 
     private final PersonDao personDao;
     private final MedicalRecordDao medicalRecordDao;

@@ -20,7 +20,7 @@ import java.util.TreeMap;
 
 @RestController
 @RequestMapping("firestation")
-public class FirestationRestController {
+public class FirestationRestController extends AbstractRestExceptionHandler {
 
     private final FireStationDao fireStationDao;
     private final PersonDao personDao;
@@ -90,15 +90,5 @@ public class FirestationRestController {
         rsModel.put("Adults", nbAdult);
 
         return ResponseEntity.ok(rsModel);
-    }
-
-    @ExceptionHandler(ElementNotFoundException.class)
-    public ResponseEntity<Void> handleElementNotFound(ElementNotFoundException ex) {
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(DatabaseException.class)
-    public ResponseEntity<Void> handleDatabaseException(DatabaseException ex) {
-        return ResponseEntity.unprocessableEntity().build();
     }
 }

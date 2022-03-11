@@ -20,7 +20,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("flood")
-public class FloodRestController {
+public class FloodRestController extends AbstractRestExceptionHandler {
 
     private final FireStationDao fireStationDao;
     private final PersonDao personDao;
