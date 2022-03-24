@@ -3,8 +3,6 @@ package fr.ocr.p5_safetynetalerts.rest;
 import fr.ocr.p5_safetynetalerts.dao.FireStationDao;
 import fr.ocr.p5_safetynetalerts.dao.MedicalRecordDao;
 import fr.ocr.p5_safetynetalerts.dao.PersonDao;
-import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
-import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.FirestationModel;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
@@ -14,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @RestController
 @RequestMapping("firestation")
@@ -68,7 +64,7 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
             attr.clear();
             attr.put("address", station.getAddress());
 
-            Map<Integer, Object> persons = new TreeMap<>();
+            List<Map<String, String>> persons = new ArrayList<>();
             for(PersonModel personModel : personDao.reads(attr)) {
                 Map<String, String> person = new TreeMap<>();
                 person.put("lastname", personModel.getLastName());
@@ -80,7 +76,7 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
                     nbAdult++;
 
                 person.put("phone", personModel.getPhone());
-                persons.put(personModel.getId(), person);
+                persons.add(person);
             }
 
             rsModel.put(station.getAddress(), persons);
