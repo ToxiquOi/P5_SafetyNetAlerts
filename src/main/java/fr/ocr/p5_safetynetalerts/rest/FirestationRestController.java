@@ -60,12 +60,12 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
         int nbChild = 0;
 
 
-        for(FirestationModel station : fireStationDao.reads(attr)) {
+        for (FirestationModel station : fireStationDao.reads(attr)) {
             attr.clear();
             attr.put("address", station.getAddress());
 
             List<Map<String, String>> persons = new ArrayList<>();
-            for(PersonModel personModel : personDao.reads(attr)) {
+            for (PersonModel personModel : personDao.reads(attr)) {
                 Map<String, String> person = new TreeMap<>();
                 person.put("lastname", personModel.getLastName());
                 person.put("firstname", personModel.getFirstName());

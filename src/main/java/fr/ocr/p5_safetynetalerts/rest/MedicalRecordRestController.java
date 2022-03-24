@@ -1,8 +1,6 @@
 package fr.ocr.p5_safetynetalerts.rest;
 
 import fr.ocr.p5_safetynetalerts.dao.MedicalRecordDao;
-import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
-import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +36,7 @@ public class MedicalRecordRestController extends AbstractRestExceptionHandler {
     @SneakyThrows
     @DeleteMapping
     public ResponseEntity<Void> deleteMedicalRecord(@RequestParam(name = "FirstName") String firstname,
-                                             @RequestParam(name = "LastName") String lastname) {
+                                                    @RequestParam(name = "LastName") String lastname) {
         medicalRecordDao.deleteByFirstNameAndLastName(firstname, lastname);
         return ResponseEntity.ok().build();
     }

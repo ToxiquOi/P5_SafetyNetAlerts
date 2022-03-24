@@ -1,8 +1,6 @@
 package fr.ocr.p5_safetynetalerts.rest;
 
 import fr.ocr.p5_safetynetalerts.dao.PersonDao;
-import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
-import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;

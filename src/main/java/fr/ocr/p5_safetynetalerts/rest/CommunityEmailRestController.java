@@ -1,14 +1,15 @@
 package fr.ocr.p5_safetynetalerts.rest;
 
 import fr.ocr.p5_safetynetalerts.dao.PersonDao;
-import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
-import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ public class CommunityEmailRestController extends AbstractRestExceptionHandler {
         ResponseModel rsModel = new ResponseModel();
 
         // Fill contents ResponseModel
-        Map<String,String> rsContents = new HashMap<>();
+        Map<String, String> rsContents = new HashMap<>();
         persons.forEach(personModel ->
                 rsContents.put(personModel.getLastName() + " " + personModel.getFirstName(), personModel.getPhone())
         );

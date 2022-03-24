@@ -44,7 +44,7 @@ public class FireRestController extends AbstractRestExceptionHandler {
         ResponseModel rsModel = new ResponseModel();
         rsModel.put("station", station.getStation());
 
-        for(PersonModel personModel : personDao.reads(attr)) {
+        for (PersonModel personModel : personDao.reads(attr)) {
             attr.clear();
             attr.put("firstname", personModel.getFirstName());
             attr.put("lastname", personModel.getLastName());

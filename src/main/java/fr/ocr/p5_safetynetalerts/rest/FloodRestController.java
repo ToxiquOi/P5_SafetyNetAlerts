@@ -46,12 +46,12 @@ public class FloodRestController extends AbstractRestExceptionHandler {
             attr.put("station", station);
 
             Map<String, List<ResponseModel>> address = new TreeMap<>();
-            for(FirestationModel firestationModel : fireStationDao.reads(attr)) {
+            for (FirestationModel firestationModel : fireStationDao.reads(attr)) {
                 attr.clear();
                 attr.put("address", firestationModel.getAddress());
 
                 List<ResponseModel> persons = new ArrayList<>();
-                for(PersonModel personModel : personDao.reads(attr)) {
+                for (PersonModel personModel : personDao.reads(attr)) {
                     attr.clear();
                     attr.put("firstname", personModel.getFirstName());
                     attr.put("lastname", personModel.getLastName());

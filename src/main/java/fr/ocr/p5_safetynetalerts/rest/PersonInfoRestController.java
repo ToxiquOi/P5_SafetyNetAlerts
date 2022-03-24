@@ -6,7 +6,6 @@ import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
 import fr.ocr.p5_safetynetalerts.utils.YearsOldCalculatorUtils;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.DateTimeException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
