@@ -50,7 +50,7 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
     }
 
     @SneakyThrows
-    @GetMapping
+   @GetMapping
     public ResponseEntity<ResponseModel> getPersonCoveredByFirestation(@RequestParam String stationNumber) {
         Map<String, String> attr = new HashMap<>();
         attr.put("station", stationNumber);

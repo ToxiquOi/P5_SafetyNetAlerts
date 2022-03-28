@@ -5,6 +5,7 @@ import fr.ocr.p5_safetynetalerts.dao.PersonDao;
 import fr.ocr.p5_safetynetalerts.database.Database;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
+import fr.ocr.p5_safetynetalerts.rest.PersonRestController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

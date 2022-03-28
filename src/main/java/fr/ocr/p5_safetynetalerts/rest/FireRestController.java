@@ -11,10 +11,7 @@ import fr.ocr.p5_safetynetalerts.utils.YearsOldCalculatorUtils;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +32,7 @@ public class FireRestController extends AbstractRestExceptionHandler {
     }
 
     @SneakyThrows
-    @GetMapping
+   @GetMapping
     public ResponseEntity<ResponseModel> getPersonAndFirestationFromAddress(@RequestParam String address) {
         Map<String, String> attr = new HashMap<>();
         attr.put("address", address);

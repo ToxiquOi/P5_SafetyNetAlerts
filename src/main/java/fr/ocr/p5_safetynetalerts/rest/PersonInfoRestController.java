@@ -9,10 +9,7 @@ import fr.ocr.p5_safetynetalerts.utils.YearsOldCalculatorUtils;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +28,7 @@ public class PersonInfoRestController extends AbstractRestExceptionHandler {
     }
 
     @SneakyThrows
-    @GetMapping
+   @GetMapping
     public ResponseEntity<ResponseModel> getMedicalRecordFromFirstNameAndLastName(@RequestParam(name = "FirstName") String firstname,
                                                                                   @RequestParam(name = "LastName") String lastname) {
         Map<String, String> attributes = new HashMap<>();
