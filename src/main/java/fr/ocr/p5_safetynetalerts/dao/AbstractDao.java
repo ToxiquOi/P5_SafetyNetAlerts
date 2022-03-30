@@ -24,7 +24,9 @@ public abstract class AbstractDao<T extends AbstractModel> {
         this.entityName = entityName;
     }
 
-    public T create(T obj) {
+    public T create(T obj) throws DatabaseException {
+        if(obj == null)
+            throw new DatabaseException("new element cannot be null");
         return database.addElement(obj);
     }
 

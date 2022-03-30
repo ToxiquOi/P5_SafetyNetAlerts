@@ -1,6 +1,7 @@
 package fr.ocr.p5_safetynetalerts;
 
 import fr.ocr.p5_safetynetalerts.database.Database;
+import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.rest.PersonRestController;
 import org.junit.jupiter.api.AfterEach;
@@ -71,5 +72,22 @@ public class PersonRestControllerTest {
         Assertions.assertEquals("updated", Objects.requireNonNull(response.getBody()).getFirstName());
         Assertions.assertEquals("updated", Objects.requireNonNull(response.getBody()).getLastName());
     }
+
+    @Test
+    void deletePersonTest() {
+        PersonModel personModel = new PersonModel();
+        personModel.setFirstName("test");
+        personModel.setLastName("test");
+        personModel.setAddress("test");
+        personModel.setEmail("test");
+        personModel.setPhone("test");
+
+        personRestController.addPerson(personModel);
+
+        personRestController.deletePerson("test", "test");
+        Assertions.assertThrows(ElementNotFoundException.class, () -> personRestController.deletePerson("test", "test"));
+    }
+
+
 
 }

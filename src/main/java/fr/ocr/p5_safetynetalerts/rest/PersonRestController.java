@@ -20,6 +20,7 @@ public class PersonRestController extends AbstractRestExceptionHandler {
         this.personDao = personDao;
     }
 
+    @SneakyThrows
     @PostMapping
     public ResponseEntity<PersonModel> addPerson(@RequestBody PersonModel personModel) {
         return ResponseEntity.ok(personDao.create(personModel));

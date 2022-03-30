@@ -29,6 +29,7 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
         this.medicalRecordDao = medicalRecordDao;
     }
 
+    @SneakyThrows
     @PostMapping
     public ResponseEntity<FirestationModel> addFirestation(@RequestBody FirestationModel personModel) {
         return ResponseEntity.ok(fireStationDao.create(personModel));

@@ -20,6 +20,7 @@ public class MedicalRecordRestController extends AbstractRestExceptionHandler {
         this.medicalRecordDao = medicalRecordDao;
     }
 
+    @SneakyThrows
     @PostMapping
     public ResponseEntity<MedicalRecordModel> addMedicalRecord(@RequestBody MedicalRecordModel personModel) {
         return ResponseEntity.ok(medicalRecordDao.create(personModel));
