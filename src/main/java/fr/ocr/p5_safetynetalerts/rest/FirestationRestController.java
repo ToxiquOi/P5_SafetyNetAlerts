@@ -45,9 +45,9 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
     @DeleteMapping
-    public ResponseEntity<ResponseModel> deleteFirestation() {
-        //TODO: Supprime le mapping ?
-        return ResponseEntity.ok(null);
+    public ResponseEntity<Boolean> deleteFirestationMapping(@RequestParam String station, @RequestParam String address) {
+        fireStationDao.suppressMapping(station, address);
+        return ResponseEntity.ok(true);
     }
 
     @SneakyThrows

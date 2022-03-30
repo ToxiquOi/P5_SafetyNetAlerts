@@ -2,7 +2,9 @@ package fr.ocr.p5_safetynetalerts;
 
 import fr.ocr.p5_safetynetalerts.database.Database;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
+import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.FirestationModel;
+import fr.ocr.p5_safetynetalerts.model.ResponseModel;
 import fr.ocr.p5_safetynetalerts.rest.FirestationRestController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -75,6 +77,17 @@ public class FirestationRestControllerTest {
         firestationModel.setAddress("test");
         firestationModel.setStation("666");
 
+        firestationRestController.addFirestation(firestationModel);
 
+        firestationRestController.deleteFirestationMapping("666", "test");
+        Assertions.assertThrows(ElementNotFoundException.class, () -> firestationRestController.deleteFirestationMapping("666", "test"));
+    }
+
+    @Test
+    void getPersonCoveredByFirestationTest() {
+        ResponseEntity<ResponseModel> response = firestationRestController.getPersonCoveredByFirestation("2");
+
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertNotNull(response.getBody());
     }
 }
