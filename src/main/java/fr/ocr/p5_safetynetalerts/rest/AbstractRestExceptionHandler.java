@@ -1,5 +1,6 @@
 package fr.ocr.p5_safetynetalerts.rest;
 
+import fr.ocr.p5_safetynetalerts.exception.ArgumentNullException;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -15,5 +16,17 @@ public abstract class AbstractRestExceptionHandler {
     @ExceptionHandler({DatabaseException.class})
     public ResponseEntity<String> handleDatabaseException(DatabaseException ex) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());
+    }
+
+    @ExceptionHandler({ArgumentNullException.class})
+    public ResponseEntity<String> handleArgumentNullException(ArgumentNullException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    protected void checkIfNotNull(Object ...args) throws ArgumentNullException {
+        for(Object arg : args) {
+            if(arg == null)
+                throw new ArgumentNullException("Argument request cannot be null");
+        }
     }
 }

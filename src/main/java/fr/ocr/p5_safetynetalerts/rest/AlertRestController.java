@@ -36,6 +36,7 @@ public class AlertRestController extends AbstractRestExceptionHandler {
     @SneakyThrows
     @GetMapping("/child")
     public ResponseEntity<ResponseModel> childAlert(@RequestParam String address) {
+        checkIfNotNull(address);
         Map<String, String> attr = new HashMap<>();
         attr.put("address", address);
 
@@ -75,11 +76,13 @@ public class AlertRestController extends AbstractRestExceptionHandler {
     @SneakyThrows
     @GetMapping("/phone")
     public ResponseEntity<ResponseModel> phoneAlert(@RequestParam String station) {
+        checkIfNotNull(station);
         Map<String, String> attr = new HashMap<>();
         attr.put("station", station);
 
         ResponseModel rsModel = new ResponseModel();
         List<String> phoneNumbers = new ArrayList<>();
+
         for (FirestationModel firestationModel : fireStationDao.reads(attr)) {
             attr.clear();
             attr.put("address", firestationModel.getAddress());

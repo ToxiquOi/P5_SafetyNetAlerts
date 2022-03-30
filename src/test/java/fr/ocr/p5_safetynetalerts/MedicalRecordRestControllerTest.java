@@ -2,6 +2,7 @@ package fr.ocr.p5_safetynetalerts;
 
 import fr.ocr.p5_safetynetalerts.dao.PersonDao;
 import fr.ocr.p5_safetynetalerts.database.Database;
+import fr.ocr.p5_safetynetalerts.exception.ArgumentNullException;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
@@ -54,7 +55,7 @@ public class MedicalRecordRestControllerTest {
 
     @Test
     void addPersonThrowDatabaseException() {
-        Assertions.assertThrows(DatabaseException.class, () -> medicalRecordRestController.addMedicalRecord(null));
+        Assertions.assertThrows(ArgumentNullException.class, () -> medicalRecordRestController.addMedicalRecord(null));
     }
 
     @Test

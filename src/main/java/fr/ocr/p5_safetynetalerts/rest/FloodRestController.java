@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @RestController
@@ -32,8 +33,8 @@ public class FloodRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
     @GetMapping( "/stations")
-    public ResponseEntity<ResponseModel> getHomeDependingFromFireStation(@RequestParam List<String> stations) {
-
+    public ResponseEntity<ResponseModel> getHomeDependingFromFireStation(@NotNull @RequestParam List<String> stations) {
+        checkIfNotNull(stations);
         ResponseModel rsModel = new ResponseModel();
 
         Map<String, String> attr = new HashMap<>();

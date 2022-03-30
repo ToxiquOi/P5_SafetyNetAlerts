@@ -94,7 +94,11 @@ public class Database {
             .filter(model -> {
                 boolean isFinded = true;
                 for (Map.Entry<String, String> attr : attributes.entrySet()) {
-                    isFinded = invokeMatchingHandler(c, isFinded, model, attr, throwables);
+                    try {
+                        isFinded = invokeMatchingHandler(c, isFinded, model, attr);
+                    } catch (DatabaseException e) {
+                        throwables.add(e);
+                    }
                 }
                 return isFinded;
             }).toList();
@@ -198,15 +202,11 @@ public class Database {
     }
 
 
-    private boolean invokeMatchingHandler(Class<?> c, boolean isFinded, AbstractModel model, Map.Entry<String, String> entry, List<Throwable> throwables) {
-        try {
-            Optional<Method> m = searchMethod("get" + entry.getKey().toLowerCase(), c) ;
-            if(m.isPresent())
-                isFinded = invokeMatchingMethod(m.get(), isFinded, model, entry.getValue());
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            throwables.add(e);
-            isFinded = false;
-        }
+    private boolean invokeMatchingHandler(Class<?> c, boolean isFinded, AbstractModel model, Map.Entry<String, String> entry) throws DatabaseException {
+
+        Optional<Method> m = searchMethod("get" + entry.getKey().toLowerCase(), c);
+        if(m.isPresent())
+            isFinded = invokeMatchingMethod(m.get(), isFinded, model, entry.getValue());
 
         return isFinded;
     }
@@ -219,21 +219,24 @@ public class Database {
      * @param model AbstractModel inherited instance containing the method 'm'
      * @param valueToMatch The value we need to match in an object
      * @return true if the parameter isFinded is true and the value searched is Matched
-     * @throws InvocationTargetException Invoking error
-     * @throws IllegalAccessException Illegal access to a method
+     * @throws DatabaseException Invoking error
      */
-    private boolean invokeMatchingMethod(Method m, boolean isFinded, AbstractModel model, String valueToMatch) throws InvocationTargetException, IllegalAccessException {
-        if(m.getReturnType().equals(List.class))
-            isFinded &= ((List<?>) m
-                    .invoke(model))
-                    .stream()
-                    .anyMatch(s -> s.equals(valueToMatch));
-        else
-            isFinded &= m
-                    .invoke(model)
-                    .toString()
-                    .contains(valueToMatch);
+    private boolean invokeMatchingMethod(Method m, boolean isFinded, AbstractModel model, String valueToMatch) throws DatabaseException {
+        try {
+            if(m.getReturnType().equals(List.class))
+                isFinded &= ((List<?>) m
+                        .invoke(model))
+                        .stream()
+                        .anyMatch(s -> s.equals(valueToMatch));
+            else
+                isFinded &= m
+                        .invoke(model)
+                        .toString()
+                        .contains(valueToMatch);
 
-        return isFinded;
+            return isFinded;
+        } catch (Exception ex) {
+            throw new DatabaseException(ex.getMessage());
+        }
     }
 }

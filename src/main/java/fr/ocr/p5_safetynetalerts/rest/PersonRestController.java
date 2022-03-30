@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 @RestController
@@ -23,19 +24,22 @@ public class PersonRestController extends AbstractRestExceptionHandler {
     @SneakyThrows
     @PostMapping
     public ResponseEntity<PersonModel> addPerson(@RequestBody PersonModel personModel) {
+        checkIfNotNull(personModel);
         return ResponseEntity.ok(personDao.create(personModel));
     }
 
     @SneakyThrows
     @PutMapping("/{id}")
-    public ResponseEntity<PersonModel> updatePerson(@RequestBody Map<String, Object> propertiesUpdate, @PathVariable int id) {
+    public ResponseEntity<PersonModel> updatePerson(@NotNull @RequestBody Map<String, Object> propertiesUpdate, @NotNull @PathVariable int id) {
+        checkIfNotNull(propertiesUpdate, id);
         return ResponseEntity.ok(personDao.update(id, propertiesUpdate));
     }
 
     @SneakyThrows
     @DeleteMapping
-    public ResponseEntity<Boolean> deletePerson(@RequestParam(name = "FirstName") String firstname,
-                                             @RequestParam(name = "LastName") String lastname) {
+    public ResponseEntity<Boolean> deletePerson(@NotNull @RequestParam(name = "FirstName") String firstname,
+                                                @NotNull @RequestParam(name = "LastName") String lastname) {
+        checkIfNotNull(firstname, lastname);
         personDao.deleteByFirstNameAndLastName(firstname, lastname);
         return ResponseEntity.ok(true);
     }

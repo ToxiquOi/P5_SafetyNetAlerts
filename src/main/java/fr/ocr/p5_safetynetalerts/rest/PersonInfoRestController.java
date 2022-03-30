@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +30,9 @@ public class PersonInfoRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
    @GetMapping
-    public ResponseEntity<ResponseModel> getMedicalRecordFromFirstNameAndLastName(@RequestParam(name = "FirstName") String firstname,
-                                                                                  @RequestParam(name = "LastName") String lastname) {
+    public ResponseEntity<ResponseModel> getMedicalRecordFromFirstNameAndLastName(@NotNull @RequestParam(name = "FirstName") String firstname,
+                                                                                  @NotNull @RequestParam(name = "LastName") String lastname) {
+        checkIfNotNull(firstname, lastname);
         Map<String, String> attributes = new HashMap<>();
         attributes.put("firstname", firstname);
         attributes.put("lastname", lastname);

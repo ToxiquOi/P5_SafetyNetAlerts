@@ -25,6 +25,7 @@ public class CommunityEmailRestController extends AbstractRestExceptionHandler {
     @SneakyThrows
    @GetMapping
     public ResponseEntity<ResponseModel> getPersonEMailFromCity(@RequestParam(name = "city") String cityName) {
+        checkIfNotNull(cityName);
         Map<String, String> attributes = new HashMap<>();
         attributes.put("city", cityName);
 

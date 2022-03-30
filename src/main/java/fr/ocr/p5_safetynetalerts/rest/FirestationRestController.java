@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 @RestController
@@ -31,13 +32,13 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
     @PostMapping
-    public ResponseEntity<FirestationModel> addFirestation(@RequestBody FirestationModel personModel) {
+    public ResponseEntity<FirestationModel> addFirestation(@NotNull @RequestBody FirestationModel personModel) {
         return ResponseEntity.ok(fireStationDao.create(personModel));
     }
 
     @SneakyThrows
     @PutMapping("/{id}")
-    public ResponseEntity<FirestationModel> updateFirestation(@RequestBody Map<String, Object> propertiesUpdate, @PathVariable int id) {
+    public ResponseEntity<FirestationModel> updateFirestation(@RequestBody Map<String, Object> propertiesUpdate, @NotNull @PathVariable int id) {
         FirestationModel updatedModel = fireStationDao.update(id, propertiesUpdate);
 
         return ResponseEntity.ok(updatedModel);
@@ -45,14 +46,15 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
     @DeleteMapping
-    public ResponseEntity<Boolean> deleteFirestationMapping(@RequestParam String station, @RequestParam String address) {
+    public ResponseEntity<Boolean> deleteFirestationMapping(@NotNull @RequestParam String station, @NotNull @RequestParam String address) {
         fireStationDao.suppressMapping(station, address);
         return ResponseEntity.ok(true);
     }
 
     @SneakyThrows
    @GetMapping
-    public ResponseEntity<ResponseModel> getPersonCoveredByFirestation(@RequestParam String stationNumber) {
+    public ResponseEntity<ResponseModel> getPersonCoveredByFirestation(@NotNull @RequestParam String stationNumber) {
+        checkIfNotNull(stationNumber);
         Map<String, String> attr = new HashMap<>();
         attr.put("station", stationNumber);
 

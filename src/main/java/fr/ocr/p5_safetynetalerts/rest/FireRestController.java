@@ -34,6 +34,7 @@ public class FireRestController extends AbstractRestExceptionHandler {
     @SneakyThrows
    @GetMapping
     public ResponseEntity<ResponseModel> getPersonAndFirestationFromAddress(@RequestParam String address) {
+        checkIfNotNull(address);
         Map<String, String> attr = new HashMap<>();
         attr.put("address", address);
 
