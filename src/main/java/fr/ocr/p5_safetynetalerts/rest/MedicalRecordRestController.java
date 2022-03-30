@@ -29,16 +29,14 @@ public class MedicalRecordRestController extends AbstractRestExceptionHandler {
     @SneakyThrows
     @PutMapping("/{id}")
     public ResponseEntity<MedicalRecordModel> updateMedicalRecord(@RequestBody Map<String, Object> propertiesUpdate, @PathVariable int id) {
-        MedicalRecordModel updatedModel = medicalRecordDao.update(id, propertiesUpdate);
-
-        return ResponseEntity.ok(updatedModel);
+        return ResponseEntity.ok(medicalRecordDao.update(id, propertiesUpdate));
     }
 
     @SneakyThrows
     @DeleteMapping
-    public ResponseEntity<Void> deleteMedicalRecord(@RequestParam(name = "FirstName") String firstname,
+    public ResponseEntity<Boolean> deleteMedicalRecord(@RequestParam(name = "FirstName") String firstname,
                                                     @RequestParam(name = "LastName") String lastname) {
         medicalRecordDao.deleteByFirstNameAndLastName(firstname, lastname);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(true);
     }
 }

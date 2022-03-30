@@ -1,6 +1,7 @@
 package fr.ocr.p5_safetynetalerts;
 
 import fr.ocr.p5_safetynetalerts.database.Database;
+import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.rest.PersonRestController;
@@ -49,6 +50,11 @@ public class PersonRestControllerTest {
 
         Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
         Assertions.assertTrue(0 < Objects.requireNonNull(response.getBody()).getId());
+    }
+
+    @Test
+    void addPersonThrowDatabaseException() {
+        Assertions.assertThrows(DatabaseException.class, () -> personRestController.addPerson(null));
     }
 
     @Test

@@ -29,16 +29,14 @@ public class PersonRestController extends AbstractRestExceptionHandler {
     @SneakyThrows
     @PutMapping("/{id}")
     public ResponseEntity<PersonModel> updatePerson(@RequestBody Map<String, Object> propertiesUpdate, @PathVariable int id) {
-        PersonModel updatedModel = personDao.update(id, propertiesUpdate);
-
-        return ResponseEntity.ok(updatedModel);
+        return ResponseEntity.ok(personDao.update(id, propertiesUpdate));
     }
 
     @SneakyThrows
     @DeleteMapping
-    public ResponseEntity<Void> deletePerson(@RequestParam(name = "FirstName") String firstname,
+    public ResponseEntity<Boolean> deletePerson(@RequestParam(name = "FirstName") String firstname,
                                              @RequestParam(name = "LastName") String lastname) {
         personDao.deleteByFirstNameAndLastName(firstname, lastname);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(true);
     }
 }
