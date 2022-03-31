@@ -11,8 +11,6 @@ import org.zalando.logbook.Precorrelation;
 @Log4j2
 public class CustomHttpLogWriter implements HttpLogWriter {
 
-    public CustomHttpLogWriter() {}
-
     @Override
     public boolean isActive() {
         return log.isTraceEnabled();

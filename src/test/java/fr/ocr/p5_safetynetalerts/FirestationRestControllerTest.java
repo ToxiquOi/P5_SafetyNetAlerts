@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @SpringBootTest
-public class FirestationRestControllerTest {
+class FirestationRestControllerTest {
 
     @Autowired
     FirestationRestController firestationRestController;
@@ -45,7 +45,7 @@ public class FirestationRestControllerTest {
 
         ResponseEntity<FirestationModel> response = firestationRestController.addFirestation(firestationModel);
 
-        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertTrue(0 < Objects.requireNonNull(response.getBody()).getId());
     }
 

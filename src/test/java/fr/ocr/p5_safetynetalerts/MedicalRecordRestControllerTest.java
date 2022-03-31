@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @SpringBootTest
-public class MedicalRecordRestControllerTest {
+class MedicalRecordRestControllerTest {
 
     @Autowired
     private MedicalRecordRestController medicalRecordRestController;
@@ -49,7 +49,7 @@ public class MedicalRecordRestControllerTest {
 
         ResponseEntity<MedicalRecordModel> response = medicalRecordRestController.addMedicalRecord(medicalRecordModel);
 
-        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertTrue(0 < Objects.requireNonNull(response.getBody()).getId());
     }
 

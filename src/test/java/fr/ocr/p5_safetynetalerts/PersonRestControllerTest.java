@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @SpringBootTest
-public class PersonRestControllerTest {
+class PersonRestControllerTest {
 
     @Autowired
     PersonRestController personRestController;
@@ -49,7 +49,7 @@ public class PersonRestControllerTest {
 
         ResponseEntity<PersonModel> response = personRestController.addPerson(personModel);
 
-        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertTrue(0 < Objects.requireNonNull(response.getBody()).getId());
     }
 

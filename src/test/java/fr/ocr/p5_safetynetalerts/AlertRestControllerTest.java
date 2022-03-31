@@ -15,12 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 @SpringBootTest
-public class AlertRestControllerTest {
+class AlertRestControllerTest {
 
     @Autowired
     AlertRestController alertRestController;
@@ -41,7 +38,7 @@ public class AlertRestControllerTest {
     @Test
     void childAlertTest() {
         ResponseEntity<ResponseModel> response = alertRestController.childAlert("1509 Culver St");
-        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertNotNull(response.getBody());
     }
 
@@ -53,7 +50,7 @@ public class AlertRestControllerTest {
     @Test
     void phoneAlertTest() {
         ResponseEntity<ResponseModel> response = alertRestController.phoneAlert("2");
-        Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertNotNull(response.getBody());
     }
 }
