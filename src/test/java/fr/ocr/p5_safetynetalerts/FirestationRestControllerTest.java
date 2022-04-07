@@ -5,7 +5,7 @@ import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.FirestationModel;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
-import fr.ocr.p5_safetynetalerts.rest.FirestationRestController;
+import fr.ocr.p5_safetynetalerts.controller.rest.FirestationRestController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,4 +1,4 @@
-package fr.ocr.p5_safetynetalerts.rest;
+package fr.ocr.p5_safetynetalerts.controller.rest;
 
 import fr.ocr.p5_safetynetalerts.dao.FireStationDao;
 import fr.ocr.p5_safetynetalerts.dao.MedicalRecordDao;

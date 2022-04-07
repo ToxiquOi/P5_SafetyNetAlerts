@@ -1,4 +1,4 @@
-package fr.ocr.p5_safetynetalerts.rest;
+package fr.ocr.p5_safetynetalerts.controller.rest;
 
 import fr.ocr.p5_safetynetalerts.dao.PersonDao;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;

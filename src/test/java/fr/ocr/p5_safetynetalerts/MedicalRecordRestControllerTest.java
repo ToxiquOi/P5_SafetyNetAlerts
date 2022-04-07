@@ -4,7 +4,7 @@ import fr.ocr.p5_safetynetalerts.service.Database;
 import fr.ocr.p5_safetynetalerts.exception.ArgumentNullException;
 import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
-import fr.ocr.p5_safetynetalerts.rest.MedicalRecordRestController;
+import fr.ocr.p5_safetynetalerts.controller.rest.MedicalRecordRestController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
