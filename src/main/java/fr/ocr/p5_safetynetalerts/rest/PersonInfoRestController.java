@@ -28,7 +28,7 @@ public class PersonInfoRestController extends AbstractRestExceptionHandler {
         this.personDao = personDao;
     }
 
-    @SneakyThrows
+   @SneakyThrows
    @GetMapping
     public ResponseEntity<ResponseModel> getMedicalRecordFromFirstNameAndLastName(@NotNull @RequestParam(name = "FirstName") String firstname,
                                                                                   @NotNull @RequestParam(name = "LastName") String lastname) {

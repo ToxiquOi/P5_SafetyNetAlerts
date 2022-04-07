@@ -51,7 +51,7 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
         return ResponseEntity.ok(true);
     }
 
-    @SneakyThrows
+   @SneakyThrows
    @GetMapping
     public ResponseEntity<ResponseModel> getPersonCoveredByFirestation(@NotNull @RequestParam String stationNumber) {
         checkIfNotNull(stationNumber);
