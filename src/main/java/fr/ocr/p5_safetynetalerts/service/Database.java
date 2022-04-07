@@ -3,6 +3,7 @@ package fr.ocr.p5_safetynetalerts.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.model.*;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -12,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+@Log4j2
 @Service
 public class Database {
 
@@ -42,7 +44,7 @@ public class Database {
             this.initializeTable(MedicalRecordModel.class);
             dataModel.medicalrecords.forEach(this::addElement);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getLocalizedMessage());
         }
     }
 
