@@ -7,7 +7,7 @@ import fr.ocr.p5_safetynetalerts.model.FirestationModel;
 import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
-import fr.ocr.p5_safetynetalerts.utils.YearsOldCalculatorUtils;
+import fr.ocr.p5_safetynetalerts.service.CalculatorService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +23,17 @@ public class FireRestController extends AbstractRestExceptionHandler {
     private final PersonDao personDao;
     private final MedicalRecordDao medicalRecordDao;
     private final FireStationDao fireStationDao;
+    private final CalculatorService calculatorService;
 
     @Autowired
-    public FireRestController(PersonDao personDao, MedicalRecordDao medicalRecordDao, FireStationDao fireStationDao) {
+    public FireRestController(PersonDao personDao,
+                              MedicalRecordDao medicalRecordDao,
+                              FireStationDao fireStationDao,
+                              CalculatorService calculatorService) {
         this.personDao = personDao;
         this.medicalRecordDao = medicalRecordDao;
         this.fireStationDao = fireStationDao;
+        this.calculatorService = calculatorService;
     }
 
     @SneakyThrows
@@ -50,7 +55,7 @@ public class FireRestController extends AbstractRestExceptionHandler {
             MedicalRecordModel medicalRecordModel = medicalRecordDao.reads(attr).get(0);
 
             ResponseModel medicalInfo = new ResponseModel();
-            medicalInfo.put("age", YearsOldCalculatorUtils.caculateYearsOld(medicalRecordModel.getBirthdate()));
+            medicalInfo.put("age", calculatorService.caculateYearsOld(medicalRecordModel.getBirthdate()));
             medicalInfo.put("medications", medicalRecordModel.getMedications());
             medicalInfo.put("allergies", medicalRecordModel.getAllergies());
 

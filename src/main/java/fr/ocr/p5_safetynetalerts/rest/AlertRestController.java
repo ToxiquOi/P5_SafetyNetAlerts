@@ -7,7 +7,7 @@ import fr.ocr.p5_safetynetalerts.model.FirestationModel;
 import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
-import fr.ocr.p5_safetynetalerts.utils.YearsOldCalculatorUtils;
+import fr.ocr.p5_safetynetalerts.service.CalculatorService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +25,14 @@ public class AlertRestController extends AbstractRestExceptionHandler {
     private final PersonDao personDao;
     private final MedicalRecordDao medicalRecordDao;
     private final FireStationDao fireStationDao;
+    private final CalculatorService calculatorService;
 
     @Autowired
-    public AlertRestController(PersonDao personDao, MedicalRecordDao medicalRecordDao, FireStationDao fireStationDao) {
+    public AlertRestController(PersonDao personDao, MedicalRecordDao medicalRecordDao, FireStationDao fireStationDao, CalculatorService calculatorService) {
         this.personDao = personDao;
         this.medicalRecordDao = medicalRecordDao;
         this.fireStationDao = fireStationDao;
+        this.calculatorService = calculatorService;
     }
 
     @SneakyThrows
@@ -51,11 +53,11 @@ public class AlertRestController extends AbstractRestExceptionHandler {
 
             MedicalRecordModel medicalRecord = medicalRecordDao.reads(attr).get(0);
 
-            if (18 > YearsOldCalculatorUtils.caculateYearsOld(medicalRecord.getBirthdate())) {
+            if (18 > calculatorService.caculateYearsOld(medicalRecord.getBirthdate())) {
                 ResponseModel personResponse = new ResponseModel();
                 personResponse.put("firstName", personModel.getFirstName());
                 personResponse.put("lastName", personModel.getLastName());
-                personResponse.put("age", YearsOldCalculatorUtils.caculateYearsOld(medicalRecord.getBirthdate()));
+                personResponse.put("age", calculatorService.caculateYearsOld(medicalRecord.getBirthdate()));
                 personResponse.put("allergies", medicalRecord.getAllergies());
                 personResponse.put("medications", medicalRecord.getMedications());
                 personResponse.put("family", personModels

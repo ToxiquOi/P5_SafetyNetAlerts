@@ -1,12 +1,9 @@
 package fr.ocr.p5_safetynetalerts;
 
-import fr.ocr.p5_safetynetalerts.dao.PersonDao;
-import fr.ocr.p5_safetynetalerts.database.Database;
+import fr.ocr.p5_safetynetalerts.service.Database;
 import fr.ocr.p5_safetynetalerts.exception.ArgumentNullException;
-import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
-import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.rest.MedicalRecordRestController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

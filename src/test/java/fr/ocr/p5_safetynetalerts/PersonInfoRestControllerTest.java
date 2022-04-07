@@ -1,9 +1,8 @@
 package fr.ocr.p5_safetynetalerts;
 
 import fr.ocr.p5_safetynetalerts.service.Database;
-import fr.ocr.p5_safetynetalerts.exception.ArgumentNullException;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
-import fr.ocr.p5_safetynetalerts.rest.AlertRestController;
+import fr.ocr.p5_safetynetalerts.rest.PersonInfoRestController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,12 +12,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-
 @SpringBootTest
-class AlertRestControllerTest {
-
+public class PersonInfoRestControllerTest {
     @Autowired
-    AlertRestController alertRestController;
+    PersonInfoRestController personInfoRestController;
 
     @Autowired
     Database database;
@@ -34,21 +31,11 @@ class AlertRestControllerTest {
     }
 
     @Test
-    void childAlertTest() {
-        ResponseEntity<ResponseModel> response = alertRestController.childAlert("1509 Culver St");
+    void getMedicalRecordFromFirstNameAndLastNameTest() {
+        ResponseEntity<ResponseModel> response = personInfoRestController.getMedicalRecordFromFirstNameAndLastName("Jacob", "Boyd");
+
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertNotNull(response.getBody());
-    }
-
-    @Test
-    void addPersonThrowDatabaseException() {
-        Assertions.assertThrows(ArgumentNullException.class, () -> alertRestController.childAlert(null));
-    }
-
-    @Test
-    void phoneAlertTest() {
-        ResponseEntity<ResponseModel> response = alertRestController.phoneAlert("2");
-        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals(1, response.getBody().size());
     }
 }

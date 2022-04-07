@@ -7,7 +7,7 @@ import fr.ocr.p5_safetynetalerts.model.FirestationModel;
 import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
-import fr.ocr.p5_safetynetalerts.utils.YearsOldCalculatorUtils;
+import fr.ocr.p5_safetynetalerts.service.CalculatorService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +23,19 @@ public class FloodRestController extends AbstractRestExceptionHandler {
     private final FireStationDao fireStationDao;
     private final PersonDao personDao;
     private final MedicalRecordDao medicalRecordDao;
+    private final CalculatorService calculatorService;
 
     @Autowired
-    public FloodRestController(FireStationDao fireStationDao, PersonDao personDao, MedicalRecordDao medicalRecordDao) {
+    public FloodRestController(FireStationDao fireStationDao,
+                               PersonDao personDao,
+                               MedicalRecordDao medicalRecordDao,
+                               CalculatorService calculatorService) {
         this.fireStationDao = fireStationDao;
         this.personDao = personDao;
         this.medicalRecordDao = medicalRecordDao;
+        this.calculatorService = calculatorService;
     }
+
 
     @SneakyThrows
     @GetMapping( "/stations")
@@ -59,7 +65,7 @@ public class FloodRestController extends AbstractRestExceptionHandler {
                     ResponseModel personRs = new ResponseModel();
                     personRs.put("lastname", personModel.getLastName());
                     personRs.put("firstname", personModel.getFirstName());
-                    personRs.put("age", YearsOldCalculatorUtils.caculateYearsOld(medicalRecordModel.getBirthdate()));
+                    personRs.put("age", calculatorService.caculateYearsOld(medicalRecordModel.getBirthdate()));
                     personRs.put("phone", personModel.getPhone());
                     personRs.put("allergies", medicalRecordModel.getAllergies());
                     personRs.put("medications", medicalRecordModel.getMedications());

@@ -3,7 +3,7 @@ package fr.ocr.p5_safetynetalerts;
 import fr.ocr.p5_safetynetalerts.dao.FireStationDao;
 import fr.ocr.p5_safetynetalerts.dao.MedicalRecordDao;
 import fr.ocr.p5_safetynetalerts.dao.PersonDao;
-import fr.ocr.p5_safetynetalerts.database.Database;
+import fr.ocr.p5_safetynetalerts.service.Database;
 import fr.ocr.p5_safetynetalerts.rest.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

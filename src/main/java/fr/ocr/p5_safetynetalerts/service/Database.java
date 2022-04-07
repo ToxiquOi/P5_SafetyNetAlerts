@@ -1,11 +1,8 @@
-package fr.ocr.p5_safetynetalerts.database;
+package fr.ocr.p5_safetynetalerts.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
-import fr.ocr.p5_safetynetalerts.model.AbstractModel;
-import fr.ocr.p5_safetynetalerts.model.FirestationModel;
-import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
-import fr.ocr.p5_safetynetalerts.model.PersonModel;
+import fr.ocr.p5_safetynetalerts.model.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

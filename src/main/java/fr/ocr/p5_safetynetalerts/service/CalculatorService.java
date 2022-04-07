@@ -1,13 +1,14 @@
-package fr.ocr.p5_safetynetalerts.utils;
+package fr.ocr.p5_safetynetalerts.service;
+
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
 
-public final class YearsOldCalculatorUtils {
+@Service
+public final class CalculatorService {
 
-    private YearsOldCalculatorUtils() {}
-
-    public static int caculateYearsOld(String birthdate) {
+    public int caculateYearsOld(String birthdate) {
         String[] splitBirthdate = birthdate.split("/");
         Period p = Period.between(LocalDate.of(Integer.parseInt(splitBirthdate[2]),
                 Integer.parseInt(splitBirthdate[1]),

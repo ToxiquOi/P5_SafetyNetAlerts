@@ -6,7 +6,7 @@ import fr.ocr.p5_safetynetalerts.dao.PersonDao;
 import fr.ocr.p5_safetynetalerts.model.FirestationModel;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
-import fr.ocr.p5_safetynetalerts.utils.YearsOldCalculatorUtils;
+import fr.ocr.p5_safetynetalerts.service.CalculatorService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +22,19 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
     private final FireStationDao fireStationDao;
     private final PersonDao personDao;
     private final MedicalRecordDao medicalRecordDao;
+    private final CalculatorService calculatorService;
 
     @Autowired
-    public FirestationRestController(FireStationDao fireStationDao, PersonDao personDao, MedicalRecordDao medicalRecordDao) {
+    public FirestationRestController(FireStationDao fireStationDao,
+                                     PersonDao personDao,
+                                     MedicalRecordDao medicalRecordDao,
+                                     CalculatorService calculatorService) {
         this.fireStationDao = fireStationDao;
         this.personDao = personDao;
         this.medicalRecordDao = medicalRecordDao;
+        this.calculatorService = calculatorService;
     }
+
 
     @SneakyThrows
     @PostMapping
@@ -39,14 +45,13 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
     @SneakyThrows
     @PutMapping("/{id}")
     public ResponseEntity<FirestationModel> updateFirestation(@RequestBody Map<String, Object> propertiesUpdate, @NotNull @PathVariable int id) {
-        FirestationModel updatedModel = fireStationDao.update(id, propertiesUpdate);
-
-        return ResponseEntity.ok(updatedModel);
+        return ResponseEntity.ok(fireStationDao.update(id, propertiesUpdate));
     }
 
     @SneakyThrows
     @DeleteMapping
-    public ResponseEntity<Boolean> deleteFirestationMapping(@NotNull @RequestParam String station, @NotNull @RequestParam String address) {
+    public ResponseEntity<Boolean> deleteFirestationMapping(@NotNull @RequestParam String station,
+                                                            @NotNull @RequestParam String address) {
         fireStationDao.suppressMapping(station, address);
         return ResponseEntity.ok(true);
     }
@@ -73,7 +78,7 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
                 person.put("lastname", personModel.getLastName());
                 person.put("firstname", personModel.getFirstName());
 
-                if (18 > YearsOldCalculatorUtils.caculateYearsOld(medicalRecordDao.reads(person).get(0).getBirthdate()))
+                if (18 > calculatorService.caculateYearsOld(medicalRecordDao.reads(person).get(0).getBirthdate()))
                     nbChild++;
                 else
                     nbAdult++;
