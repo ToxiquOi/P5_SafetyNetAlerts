@@ -18,11 +18,11 @@ public class CustomHttpLogWriter implements HttpLogWriter {
 
     @Override
     public void write(Precorrelation precorrelation, String request) {
-        log.trace("RECEIVE " + request);
+        log.info("RECEIVE " + request);
     }
 
     @Override
     public void write(Correlation correlation, String response) {
-        log.trace("SEND " + response);
+        log.info("SEND " + response);
     }
 }

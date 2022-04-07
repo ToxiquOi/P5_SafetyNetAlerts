@@ -8,9 +8,4 @@ public class ArgumentNullException extends Exception {
         super(message);
         log.error(this.getLocalizedMessage(), this);
     }
-
-    public ArgumentNullException(String message, Throwable cause) {
-        super(message, cause);
-        log.error(this.getLocalizedMessage(), cause);
-    }
 }
