@@ -1,6 +1,6 @@
 package fr.ocr.p5_safetynetalerts.dao;
 
-import fr.ocr.p5_safetynetalerts.database.Database;
+import fr.ocr.p5_safetynetalerts.service.Database;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.AbstractModel;
@@ -24,7 +24,9 @@ public abstract class AbstractDao<T extends AbstractModel> {
         this.entityName = entityName;
     }
 
-    public T create(T obj) {
+    public T create(T obj) throws DatabaseException {
+        if(obj == null)
+            throw new DatabaseException("new element cannot be null");
         return database.addElement(obj);
     }
 

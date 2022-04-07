@@ -1,8 +1,7 @@
 package fr.ocr.p5_safetynetalerts;
 
-import fr.ocr.p5_safetynetalerts.component.AbstractModelTestImp;
 import fr.ocr.p5_safetynetalerts.dao.PersonDao;
-import fr.ocr.p5_safetynetalerts.database.Database;
+import fr.ocr.p5_safetynetalerts.service.Database;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import org.junit.jupiter.api.AfterEach;

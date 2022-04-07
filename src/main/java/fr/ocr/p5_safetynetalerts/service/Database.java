@@ -1,11 +1,9 @@
-package fr.ocr.p5_safetynetalerts.database;
+package fr.ocr.p5_safetynetalerts.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
-import fr.ocr.p5_safetynetalerts.model.AbstractModel;
-import fr.ocr.p5_safetynetalerts.model.FirestationModel;
-import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
-import fr.ocr.p5_safetynetalerts.model.PersonModel;
+import fr.ocr.p5_safetynetalerts.model.*;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -15,10 +13,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+@Log4j2
 @Service
 public class Database {
-
-    private static Database database;
 
     private final Map<Class<? extends AbstractModel>, Integer> indexes = new HashMap<>();
     private final Map<Class<? extends AbstractModel>, List<AbstractModel>> data = new HashMap<>();
@@ -47,7 +44,7 @@ public class Database {
             this.initializeTable(MedicalRecordModel.class);
             dataModel.medicalrecords.forEach(this::addElement);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getLocalizedMessage());
         }
     }
 
@@ -96,7 +93,11 @@ public class Database {
             .filter(model -> {
                 boolean isFinded = true;
                 for (Map.Entry<String, String> attr : attributes.entrySet()) {
-                    isFinded = invokeMatchingHandler(c, isFinded, model, attr, throwables);
+                    try {
+                        isFinded = invokeMatchingHandler(c, isFinded, model, attr);
+                    } catch (DatabaseException e) {
+                        throwables.add(e);
+                    }
                 }
                 return isFinded;
             }).toList();
@@ -200,15 +201,11 @@ public class Database {
     }
 
 
-    private boolean invokeMatchingHandler(Class<?> c, boolean isFinded, AbstractModel model, Map.Entry<String, String> entry, List<Throwable> throwables) {
-        try {
-            Optional<Method> m = searchMethod("get" + entry.getKey().toLowerCase(), c) ;
-            if(m.isPresent())
-                isFinded = invokeMatchingMethod(m.get(), isFinded, model, entry.getValue());
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            throwables.add(e);
-            isFinded = false;
-        }
+    private boolean invokeMatchingHandler(Class<?> c, boolean isFinded, AbstractModel model, Map.Entry<String, String> entry) throws DatabaseException {
+
+        Optional<Method> m = searchMethod("get" + entry.getKey().toLowerCase(), c);
+        if(m.isPresent())
+            isFinded = invokeMatchingMethod(m.get(), isFinded, model, entry.getValue());
 
         return isFinded;
     }
@@ -221,21 +218,24 @@ public class Database {
      * @param model AbstractModel inherited instance containing the method 'm'
      * @param valueToMatch The value we need to match in an object
      * @return true if the parameter isFinded is true and the value searched is Matched
-     * @throws InvocationTargetException Invoking error
-     * @throws IllegalAccessException Illegal access to a method
+     * @throws DatabaseException Invoking error
      */
-    private boolean invokeMatchingMethod(Method m, boolean isFinded, AbstractModel model, String valueToMatch) throws InvocationTargetException, IllegalAccessException {
-        if(m.getReturnType().equals(List.class))
-            isFinded &= ((List<?>) m
-                    .invoke(model))
-                    .stream()
-                    .anyMatch(s -> s.equals(valueToMatch));
-        else
-            isFinded &= m
-                    .invoke(model)
-                    .toString()
-                    .contains(valueToMatch);
+    private boolean invokeMatchingMethod(Method m, boolean isFinded, AbstractModel model, String valueToMatch) throws DatabaseException {
+        try {
+            if(m.getReturnType().equals(List.class))
+                isFinded &= ((List<?>) m
+                        .invoke(model))
+                        .stream()
+                        .anyMatch(s -> s.equals(valueToMatch));
+            else
+                isFinded &= m
+                        .invoke(model)
+                        .toString()
+                        .contains(valueToMatch);
 
-        return isFinded;
+            return isFinded;
+        } catch (Exception ex) {
+            throw new DatabaseException(ex.getMessage());
+        }
     }
 }

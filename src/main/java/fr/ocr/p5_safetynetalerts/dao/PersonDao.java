@@ -1,6 +1,6 @@
 package fr.ocr.p5_safetynetalerts.dao;
 
-import fr.ocr.p5_safetynetalerts.database.Database;
+import fr.ocr.p5_safetynetalerts.service.Database;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.exception.ElementNotFoundException;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -23,7 +24,13 @@ public class PersonDao extends AbstractDao<PersonModel> {
         attributes.put("FirstName", firstName);
         attributes.put("LastName", lastName);
 
-        PersonModel model = this.reads(attributes).get(0);
+        List<PersonModel> personModelList = this.reads(attributes);
+
+        if(personModelList.isEmpty()) {
+            throw new ElementNotFoundException(lastName + " " + firstName + " doesn't exist");
+        }
+
+        PersonModel model = personModelList.get(0);
         delete(model.getId());
     }
 }
