@@ -22,7 +22,7 @@ public class CommunityEmailRestController extends AbstractRestExceptionHandler {
         this.personDao = personDao;
     }
 
-    @SneakyThrows
+   @SneakyThrows
    @GetMapping
     public ResponseEntity<ResponseModel> getPersonEMailFromCity(@RequestParam(name = "city") String cityName) {
         checkIfNotNull(cityName);

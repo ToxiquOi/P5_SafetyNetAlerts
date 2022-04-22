@@ -86,31 +86,17 @@ public class Database {
      */
     public <T extends AbstractModel> List<T> getElement(Class<T> c, Map<String, String> attributes) throws DatabaseException {
         if(!data.containsKey(c)) throw new DatabaseException("Table not exist");
-        final List<Throwable> throwables = new ArrayList<>();
 
-        List<AbstractModel> result = data.get(c)
-            .stream()
-            .filter(model -> {
-                boolean isFinded = true;
-                for (Map.Entry<String, String> attr : attributes.entrySet()) {
-                    try {
-                        isFinded = invokeMatchingHandler(c, isFinded, model, attr);
-                    } catch (DatabaseException e) {
-                        throwables.add(e);
-                    }
-                }
-                return isFinded;
-            }).toList();
+        List<AbstractModel> result = new ArrayList<>();
+        for(AbstractModel model : data.get(c)) {
+            boolean isFinded = true;
+            for(Map.Entry<String, String> attr : attributes.entrySet()) {
+                isFinded = invokeMatchingHandler(c, model, attr);
+                if(!isFinded) break;
+            }
+            if(!isFinded) continue;
 
-        // Handling error
-        if (result.isEmpty() && !throwables.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            throwables.forEach(ex -> {
-                sb.append(ex.getLocalizedMessage());
-                sb.append("\n");
-            });
-
-            throw new DatabaseException("Error during data processing, " + sb);
+            result.add(model);
         }
 
         return (List<T>) result;
@@ -187,6 +173,15 @@ public class Database {
                 .findFirst();
     }
 
+    private boolean invokeMatchingHandler(Class<?> c, AbstractModel model, Map.Entry<String, String> entry) throws DatabaseException {
+
+        Optional<Method> m = searchMethod("get" + entry.getKey().toLowerCase(), c);
+        if(m.isPresent())
+            return invokeMatchingMethod(m.get(), model, entry.getValue());
+        else
+            return false;
+    }
+
     /**
      * Search a method in a class
      * @param name method searched
@@ -200,40 +195,26 @@ public class Database {
                 .findFirst();
     }
 
-
-    private boolean invokeMatchingHandler(Class<?> c, boolean isFinded, AbstractModel model, Map.Entry<String, String> entry) throws DatabaseException {
-
-        Optional<Method> m = searchMethod("get" + entry.getKey().toLowerCase(), c);
-        if(m.isPresent())
-            isFinded = invokeMatchingMethod(m.get(), isFinded, model, entry.getValue());
-
-        return isFinded;
-    }
-
     /**
      * Method used to match a value stored in an AbstractModel,
      * this method is able to match a value in a String Type or a List
      * @param m Method to invoke
-     * @param isFinded A flag setted after invoking method
      * @param model AbstractModel inherited instance containing the method 'm'
      * @param valueToMatch The value we need to match in an object
      * @return true if the parameter isFinded is true and the value searched is Matched
      * @throws DatabaseException Invoking error
      */
-    private boolean invokeMatchingMethod(Method m, boolean isFinded, AbstractModel model, String valueToMatch) throws DatabaseException {
+    private boolean invokeMatchingMethod(Method m, AbstractModel model, String valueToMatch) throws DatabaseException {
         try {
             if(m.getReturnType().equals(List.class))
-                isFinded &= ((List<?>) m
+                return ((List<?>) m
                         .invoke(model))
                         .stream()
                         .anyMatch(s -> s.equals(valueToMatch));
             else
-                isFinded &= m
-                        .invoke(model)
+                return m.invoke(model)
                         .toString()
                         .contains(valueToMatch);
-
-            return isFinded;
         } catch (Exception ex) {
             throw new DatabaseException(ex.getMessage());
         }

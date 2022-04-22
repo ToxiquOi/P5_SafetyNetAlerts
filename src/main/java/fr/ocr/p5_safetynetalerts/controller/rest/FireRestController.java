@@ -36,7 +36,7 @@ public class FireRestController extends AbstractRestExceptionHandler {
         this.calculatorService = calculatorService;
     }
 
-    @SneakyThrows
+   @SneakyThrows
    @GetMapping
     public ResponseEntity<ResponseModel> getPersonAndFirestationFromAddress(@RequestParam String address) {
         checkIfNotNull(address);

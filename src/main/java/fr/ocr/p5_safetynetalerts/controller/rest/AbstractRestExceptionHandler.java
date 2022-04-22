@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 public abstract class AbstractRestExceptionHandler {
+
     @ExceptionHandler(ElementNotFoundException.class)
     public ResponseEntity<String> handleElementNotFound(ElementNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
