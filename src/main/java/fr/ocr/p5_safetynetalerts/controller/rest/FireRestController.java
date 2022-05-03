@@ -1,4 +1,4 @@
-package fr.ocr.p5_safetynetalerts.rest;
+package fr.ocr.p5_safetynetalerts.controller.rest;
 
 import fr.ocr.p5_safetynetalerts.dao.FireStationDao;
 import fr.ocr.p5_safetynetalerts.dao.MedicalRecordDao;
@@ -36,7 +36,7 @@ public class FireRestController extends AbstractRestExceptionHandler {
         this.calculatorService = calculatorService;
     }
 
-    @SneakyThrows
+   @SneakyThrows
    @GetMapping
     public ResponseEntity<ResponseModel> getPersonAndFirestationFromAddress(@RequestParam String address) {
         checkIfNotNull(address);

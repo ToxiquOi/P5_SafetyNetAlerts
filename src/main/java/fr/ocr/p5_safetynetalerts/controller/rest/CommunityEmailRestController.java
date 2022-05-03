@@ -1,4 +1,4 @@
-package fr.ocr.p5_safetynetalerts.rest;
+package fr.ocr.p5_safetynetalerts.controller.rest;
 
 import fr.ocr.p5_safetynetalerts.dao.PersonDao;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
@@ -22,7 +22,7 @@ public class CommunityEmailRestController extends AbstractRestExceptionHandler {
         this.personDao = personDao;
     }
 
-    @SneakyThrows
+   @SneakyThrows
    @GetMapping
     public ResponseEntity<ResponseModel> getPersonEMailFromCity(@RequestParam(name = "city") String cityName) {
         checkIfNotNull(cityName);

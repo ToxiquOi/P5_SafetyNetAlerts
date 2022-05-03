@@ -2,7 +2,7 @@ package fr.ocr.p5_safetynetalerts;
 
 import fr.ocr.p5_safetynetalerts.service.Database;
 import fr.ocr.p5_safetynetalerts.model.ResponseModel;
-import fr.ocr.p5_safetynetalerts.rest.FloodRestController;
+import fr.ocr.p5_safetynetalerts.controller.rest.FloodRestController;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

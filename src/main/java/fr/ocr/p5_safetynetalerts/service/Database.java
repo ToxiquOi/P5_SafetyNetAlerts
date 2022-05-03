@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.ocr.p5_safetynetalerts.exception.DatabaseException;
 import fr.ocr.p5_safetynetalerts.model.*;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -19,10 +20,12 @@ public class Database {
 
     private final Map<Class<? extends AbstractModel>, Integer> indexes = new HashMap<>();
     private final Map<Class<? extends AbstractModel>, List<AbstractModel>> data = new HashMap<>();
+    private final ModelReflectionService reflectionService;
 
-
-    private  Database() {
+    @Autowired
+    private  Database(ModelReflectionService reflectionService) {
         loadData(getClass().getClassLoader().getResourceAsStream("data.json"));
+        this.reflectionService = reflectionService;
     }
 
     /**
@@ -86,31 +89,17 @@ public class Database {
      */
     public <T extends AbstractModel> List<T> getElement(Class<T> c, Map<String, String> attributes) throws DatabaseException {
         if(!data.containsKey(c)) throw new DatabaseException("Table not exist");
-        final List<Throwable> throwables = new ArrayList<>();
 
-        List<AbstractModel> result = data.get(c)
-            .stream()
-            .filter(model -> {
-                boolean isFinded = true;
-                for (Map.Entry<String, String> attr : attributes.entrySet()) {
-                    try {
-                        isFinded = invokeMatchingHandler(c, isFinded, model, attr);
-                    } catch (DatabaseException e) {
-                        throwables.add(e);
-                    }
-                }
-                return isFinded;
-            }).toList();
+        List<AbstractModel> result = new ArrayList<>();
+        for(AbstractModel model : data.get(c)) {
+            boolean isFinded = true;
+            for(Map.Entry<String, String> attr : attributes.entrySet()) {
+                isFinded = reflectionService.isModelContainEntry(c, model, attr);
+                if(!isFinded) break;
+            }
+            if(!isFinded) continue;
 
-        // Handling error
-        if (result.isEmpty() && !throwables.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            throwables.forEach(ex -> {
-                sb.append(ex.getLocalizedMessage());
-                sb.append("\n");
-            });
-
-            throw new DatabaseException("Error during data processing, " + sb);
+            result.add(model);
         }
 
         return (List<T>) result;
@@ -133,9 +122,10 @@ public class Database {
         if(toUpdate.isEmpty()) return null;
 
         T element = toUpdate.get();
+
         for (Map.Entry<String, Object> attr : attributes.entrySet()) {
             try {
-                Optional<Method> m = searchMethod("set" + StringUtils.capitalize(attr.getKey().toLowerCase()), c, String.class);
+                Optional<Method> m = reflectionService.searchMethod("set" + StringUtils.capitalize(attr.getKey().toLowerCase()), c, String.class);
                 if(m.isPresent()) m.get().invoke(element, attr.getValue());
 
             } catch (InvocationTargetException | IllegalAccessException e) {
@@ -173,69 +163,5 @@ public class Database {
 
     public void truncate() {
         data.clear();
-    }
-
-    /**
-     * Search a method in a class
-     * @param name method searched
-     * @param c class containing method
-     * @return An Optional<Method> object
-     */
-    private Optional<Method> searchMethod(String name, Class<?> c) {
-        return Arrays.stream(c.getMethods())
-                .filter(mSearched -> mSearched.getName().equalsIgnoreCase(name))
-                .findFirst();
-    }
-
-    /**
-     * Search a method in a class
-     * @param name method searched
-     * @param c class containing method
-     * @param args argument types of the seached method
-     * @return An Optional<Method> object
-     */
-    private Optional<Method> searchMethod(String name, Class<?> c, Class<?>... args) {
-        return Arrays.stream(c.getMethods())
-                .filter(mSearched -> mSearched.getName().equalsIgnoreCase(name) && Arrays.equals(mSearched.getParameterTypes(), args))
-                .findFirst();
-    }
-
-
-    private boolean invokeMatchingHandler(Class<?> c, boolean isFinded, AbstractModel model, Map.Entry<String, String> entry) throws DatabaseException {
-
-        Optional<Method> m = searchMethod("get" + entry.getKey().toLowerCase(), c);
-        if(m.isPresent())
-            isFinded = invokeMatchingMethod(m.get(), isFinded, model, entry.getValue());
-
-        return isFinded;
-    }
-
-    /**
-     * Method used to match a value stored in an AbstractModel,
-     * this method is able to match a value in a String Type or a List
-     * @param m Method to invoke
-     * @param isFinded A flag setted after invoking method
-     * @param model AbstractModel inherited instance containing the method 'm'
-     * @param valueToMatch The value we need to match in an object
-     * @return true if the parameter isFinded is true and the value searched is Matched
-     * @throws DatabaseException Invoking error
-     */
-    private boolean invokeMatchingMethod(Method m, boolean isFinded, AbstractModel model, String valueToMatch) throws DatabaseException {
-        try {
-            if(m.getReturnType().equals(List.class))
-                isFinded &= ((List<?>) m
-                        .invoke(model))
-                        .stream()
-                        .anyMatch(s -> s.equals(valueToMatch));
-            else
-                isFinded &= m
-                        .invoke(model)
-                        .toString()
-                        .contains(valueToMatch);
-
-            return isFinded;
-        } catch (Exception ex) {
-            throw new DatabaseException(ex.getMessage());
-        }
     }
 }
