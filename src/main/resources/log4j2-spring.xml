@@ -31,7 +31,7 @@
         </Root>
 
         <!-- LOG "com.baeldung*" at TRACE level -->
-        <Logger name="fr.ocr.p5_safetynetalerts" level="trace"></Logger>
+        <Logger name="fr.ocr.p5_safetynetalerts" level="DEBUG"/>
     </Loggers>
 
 </Configuration>

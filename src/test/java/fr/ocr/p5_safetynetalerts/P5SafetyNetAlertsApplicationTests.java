@@ -3,8 +3,10 @@ package fr.ocr.p5_safetynetalerts;
 import fr.ocr.p5_safetynetalerts.dao.FireStationDao;
 import fr.ocr.p5_safetynetalerts.dao.MedicalRecordDao;
 import fr.ocr.p5_safetynetalerts.dao.PersonDao;
+import fr.ocr.p5_safetynetalerts.service.CalculatorService;
 import fr.ocr.p5_safetynetalerts.service.Database;
 import fr.ocr.p5_safetynetalerts.controller.rest.*;
+import fr.ocr.p5_safetynetalerts.service.ModelReflectionService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,8 @@ class P5SafetyNetAlertsApplicationTests {
     private final MedicalRecordRestController medicalRecordRestController;
     private final PersonInfoRestController personInfoRestController;
     private final PersonRestController personRestController;
+    private final ModelReflectionService reflectionService;
+    private final CalculatorService calculatorService;
 
     @Autowired
     public P5SafetyNetAlertsApplicationTests(Database database, FireStationDao fireStationDao,
@@ -32,7 +36,8 @@ class P5SafetyNetAlertsApplicationTests {
                                              AlertRestController alertRestController, CommunityEmailRestController communityEmailRestController,
                                              FireRestController fireRestController, FirestationRestController firestationRestController,
                                              FloodRestController floodRestController, MedicalRecordRestController medicalRecordRestController,
-                                             PersonInfoRestController personInfoRestController, PersonRestController personRestController) {
+                                             PersonInfoRestController personInfoRestController, PersonRestController personRestController,
+                                             ModelReflectionService reflectionService, CalculatorService calculatorService) {
         this.database = database;
         this.fireStationDao = fireStationDao;
         this.medicalRecordDao = medicalRecordDao;
@@ -45,6 +50,8 @@ class P5SafetyNetAlertsApplicationTests {
         this.medicalRecordRestController = medicalRecordRestController;
         this.personInfoRestController = personInfoRestController;
         this.personRestController = personRestController;
+        this.reflectionService = reflectionService;
+        this.calculatorService = calculatorService;
     }
 
     @Test
@@ -61,6 +68,8 @@ class P5SafetyNetAlertsApplicationTests {
         Assertions.assertNotNull(medicalRecordRestController);
         Assertions.assertNotNull(personInfoRestController);
         Assertions.assertNotNull(personRestController);
+        Assertions.assertNotNull(reflectionService);
+        Assertions.assertNotNull(calculatorService);
     }
 
 }
