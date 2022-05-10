@@ -82,7 +82,7 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
                 person.put("lastname", personModel.getLastName());
                 person.put("firstname", personModel.getFirstName());
 
-                if (18 > calculatorService.caculateYearsOld(medicalRecordDao.reads(person).get(0).getBirthdate()))
+                if (18 <= calculatorService.caculateYearsOld(medicalRecordDao.reads(person).get(0).getBirthdate()))
                     nbChild++;
                 else
                     nbAdult++;
