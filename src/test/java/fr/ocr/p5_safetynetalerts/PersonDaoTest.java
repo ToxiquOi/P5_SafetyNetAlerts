@@ -41,7 +41,7 @@ class PersonDaoTest {
 
         Assertions.assertEquals(1, personDao.reads(attributes).size());
         personDao.deleteByFirstNameAndLastName("Ron", "Peters");
-        Assertions.assertEquals(0, personDao.reads(attributes).size());
+        Assertions.assertThrows(ElementNotFoundException.class, () -> personDao.reads(attributes));
     }
 
 }

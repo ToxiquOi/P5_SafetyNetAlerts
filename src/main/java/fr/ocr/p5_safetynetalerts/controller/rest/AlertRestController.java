@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("alert")
 public class AlertRestController extends AbstractRestExceptionHandler {
 
     private final PersonDao personDao;
@@ -36,14 +35,16 @@ public class AlertRestController extends AbstractRestExceptionHandler {
     }
 
     @SneakyThrows
-    @GetMapping("/child")
+    @GetMapping("childAlert")
     public ResponseEntity<ResponseModel> childAlert(@RequestParam String address) {
         checkIfNotNull(address);
         Map<String, String> attr = new HashMap<>();
         attr.put("address", address);
 
 
-        List<ResponseModel> personList = new ArrayList<>();
+        List<ResponseModel> childList = new ArrayList<>();
+
+
         List<PersonModel> personModels = personDao.reads(attr);
 
         for (PersonModel personModel : personModels) {
@@ -52,31 +53,33 @@ public class AlertRestController extends AbstractRestExceptionHandler {
             attr.put("firstname", personModel.getFirstName());
 
             MedicalRecordModel medicalRecord = medicalRecordDao.reads(attr).get(0);
-
             if (18 > calculatorService.caculateYearsOld(medicalRecord.getBirthdate())) {
-                ResponseModel personResponse = new ResponseModel();
-                personResponse.put("firstName", personModel.getFirstName());
-                personResponse.put("lastName", personModel.getLastName());
-                personResponse.put("age", calculatorService.caculateYearsOld(medicalRecord.getBirthdate()));
-                personResponse.put("allergies", medicalRecord.getAllergies());
-                personResponse.put("medications", medicalRecord.getMedications());
-                personResponse.put("family", personModels
+
+                ResponseModel child = new ResponseModel();
+                child.put("firstName", personModel.getFirstName());
+                child.put("lastName", personModel.getLastName());
+                child.put("age", calculatorService.caculateYearsOld(medicalRecord.getBirthdate()));
+                child.put("allergies", medicalRecord.getAllergies());
+                child.put("medications", medicalRecord.getMedications());
+                child.put("family", personModels
                         .stream()
                         .filter(p -> p.getLastName().equals(personModel.getLastName()) && !p.getFirstName().equals(personModel.getFirstName()))
                         .toList()
                 );
-                personList.add(personResponse);
+
+                childList.add(child);
             }
         }
 
         ResponseModel rsModel = new ResponseModel();
-        rsModel.put(address, personList);
+        rsModel.put("address", address);
+        rsModel.put("childs", childList);
 
         return ResponseEntity.ok(rsModel);
     }
 
     @SneakyThrows
-    @GetMapping("/phone")
+    @GetMapping("phoneAlert")
     public ResponseEntity<ResponseModel> phoneAlert(@RequestParam String station) {
         checkIfNotNull(station);
         Map<String, String> attr = new HashMap<>();
@@ -93,7 +96,8 @@ public class AlertRestController extends AbstractRestExceptionHandler {
                     .forEach(personModel -> phoneNumbers.add(personModel.getPhone()));
         }
 
-        rsModel.put(station, phoneNumbers);
+        rsModel.put("station", station);
+        rsModel.put("phones", phoneNumbers);
 
         return ResponseEntity.ok(rsModel);
     }

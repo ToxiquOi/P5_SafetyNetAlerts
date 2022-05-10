@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -32,32 +34,47 @@ public class PersonInfoRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
    @GetMapping
-    public ResponseEntity<ResponseModel> getMedicalRecordFromFirstNameAndLastName(@NotNull @RequestParam(name = "FirstName") String firstname,
-                                                                                  @NotNull @RequestParam(name = "LastName") String lastname) {
-        checkIfNotNull(firstname, lastname);
+    public ResponseEntity<List<ResponseModel>> getMedicalRecordFromFirstNameAndLastName(@RequestParam(name = "FirstName") String firstname, @NotNull @RequestParam(name = "LastName") String lastname) {
+        checkIfNotNull(lastname);
         Map<String, String> attributes = new HashMap<>();
-        attributes.put("firstname", firstname);
+
+        int indexMainPerson = 0;
+
         attributes.put("lastname", lastname);
 
-        PersonModel personModel = personDao.reads(attributes).get(0);
-        MedicalRecordModel medicalRecordModel = medicalRecordDao.reads(attributes).get(0);
+        List<ResponseModel> personRsList = new ArrayList<>();
+        for(PersonModel personModel : personDao.reads(attributes)) {
+            if(attributes.containsKey("firstname"))
+                attributes.replace("firstname", personModel.getFirstName());
+            else
+            attributes.put("firstname", personModel.getFirstName());
 
-        ResponseModel rsModel = new ResponseModel();
-        String key = medicalRecordModel.getFirstName() + " " + medicalRecordModel.getLastName();
+            MedicalRecordModel medicalRecordModel = medicalRecordDao.reads(attributes).get(0);
 
-        //Calcul age
-        int yearsOld = calculatorService.caculateYearsOld(medicalRecordModel.getBirthdate());
 
-        //Prepare response contents
-        ResponseModel value = new ResponseModel();
-        value.put("age", yearsOld);
-        value.put("address", personModel.getAddress());
-        value.put("mail", personModel.getEmail());
-        value.put("allergies", medicalRecordModel.getAllergies());
-        value.put("medications", medicalRecordModel.getMedications());
+            int yearsOld = calculatorService.caculateYearsOld(medicalRecordModel.getBirthdate());
 
-        rsModel.put(key, value);
+            //Prepare response contents
+            ResponseModel personRs = new ResponseModel();
+            personRs.put("firstname", personModel.getFirstName());
+            personRs.put("lastname", personModel.getLastName());
+            personRs.put("age", yearsOld);
+            personRs.put("address", personModel.getAddress());
+            personRs.put("mail", personModel.getEmail());
+            personRs.put("allergies", medicalRecordModel.getAllergies());
+            personRs.put("medications", medicalRecordModel.getMedications());
 
-        return ResponseEntity.ok(rsModel);
+            personRsList.add(personRs);
+            if(personModel.getFirstName().equals(firstname))
+                indexMainPerson = personRsList.indexOf(personRs);
+        }
+
+        // Move the main searched Person to the first place of the list
+        if(indexMainPerson != 0) {
+            ResponseModel mainModelRequest = personRsList.remove(indexMainPerson);
+            personRsList.add(0, mainModelRequest);
+        }
+
+        return ResponseEntity.ok(personRsList);
     }
 }

@@ -37,8 +37,10 @@ public abstract class AbstractDao<T extends AbstractModel> {
         return opt.get();
     }
 
-    public List<T> reads(Map<String, String> attributes) throws DatabaseException {
-        return database.getElement(cModel, attributes);
+    public List<T> reads(Map<String, String> attributes) throws DatabaseException, ElementNotFoundException {
+        List<T> list = database.getElement(cModel, attributes);
+        if (list.isEmpty()) throw new ElementNotFoundException("No result in database for this request");
+        return list;
     }
 
     public T update(int id, Map<String, Object> attributes) throws DatabaseException, ElementNotFoundException {

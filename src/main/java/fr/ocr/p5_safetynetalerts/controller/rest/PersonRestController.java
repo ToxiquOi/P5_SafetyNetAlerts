@@ -2,6 +2,7 @@ package fr.ocr.p5_safetynetalerts.controller.rest;
 
 import fr.ocr.p5_safetynetalerts.dao.PersonDao;
 import fr.ocr.p5_safetynetalerts.model.PersonModel;
+import fr.ocr.p5_safetynetalerts.model.ResponseModel;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +38,14 @@ public class PersonRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
     @DeleteMapping
-    public ResponseEntity<Boolean> deletePerson(@NotNull @RequestParam(name = "FirstName") String firstname,
-                                                @NotNull @RequestParam(name = "LastName") String lastname) {
+    public ResponseEntity<ResponseModel> deletePerson(@NotNull @RequestParam(name = "FirstName") String firstname,
+                                                      @NotNull @RequestParam(name = "LastName") String lastname) {
         checkIfNotNull(firstname, lastname);
         personDao.deleteByFirstNameAndLastName(firstname, lastname);
-        return ResponseEntity.ok(true);
+
+        ResponseModel response = new ResponseModel();
+        response.put("result", true);
+
+        return ResponseEntity.ok(response);
     }
 }

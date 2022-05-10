@@ -2,6 +2,7 @@ package fr.ocr.p5_safetynetalerts.controller.rest;
 
 import fr.ocr.p5_safetynetalerts.dao.MedicalRecordDao;
 import fr.ocr.p5_safetynetalerts.model.MedicalRecordModel;
+import fr.ocr.p5_safetynetalerts.model.ResponseModel;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +37,14 @@ public class MedicalRecordRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
     @DeleteMapping
-    public ResponseEntity<Boolean> deleteMedicalRecord(@RequestParam(name = "FirstName") String firstname,
+    public ResponseEntity<ResponseModel> deleteMedicalRecord(@RequestParam(name = "FirstName") String firstname,
                                                     @RequestParam(name = "LastName") String lastname) {
         checkIfNotNull(firstname, lastname);
         medicalRecordDao.deleteByFirstNameAndLastName(firstname, lastname);
-        return ResponseEntity.ok(true);
+
+        ResponseModel response = new ResponseModel();
+        response.put("result", true);
+
+        return ResponseEntity.ok(response);
     }
 }

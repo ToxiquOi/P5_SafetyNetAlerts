@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -44,24 +46,31 @@ public class FireRestController extends AbstractRestExceptionHandler {
         attr.put("address", address);
 
         FirestationModel station = fireStationDao.reads(attr).get(0);
-        ResponseModel rsModel = new ResponseModel();
-        rsModel.put("station", station.getStation());
 
+
+        List<ResponseModel> responseModels = new ArrayList<>();
         for (PersonModel personModel : personDao.reads(attr)) {
             attr.clear();
             attr.put("firstname", personModel.getFirstName());
             attr.put("lastname", personModel.getLastName());
 
+
             MedicalRecordModel medicalRecordModel = medicalRecordDao.reads(attr).get(0);
 
             ResponseModel medicalInfo = new ResponseModel();
+            medicalInfo.put("firstname", personModel.getFirstName());
+            medicalInfo.put("lastname", personModel.getLastName());
+            medicalInfo.put("phone", personModel.getPhone());
             medicalInfo.put("age", calculatorService.caculateYearsOld(medicalRecordModel.getBirthdate()));
             medicalInfo.put("medications", medicalRecordModel.getMedications());
             medicalInfo.put("allergies", medicalRecordModel.getAllergies());
 
-            rsModel.put(personModel.getLastName() + " " + personModel.getFirstName(), medicalInfo);
+            responseModels.add(medicalInfo);
         }
 
+        ResponseModel rsModel = new ResponseModel();
+        rsModel.put("station", station.getStation());
+        rsModel.put("persons", responseModels);
 
         return ResponseEntity.ok(rsModel);
     }

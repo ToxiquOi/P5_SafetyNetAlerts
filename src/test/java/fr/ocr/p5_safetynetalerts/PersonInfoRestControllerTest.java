@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 @SpringBootTest
 public class PersonInfoRestControllerTest {
     @Autowired
@@ -32,10 +34,10 @@ public class PersonInfoRestControllerTest {
 
     @Test
     void getMedicalRecordFromFirstNameAndLastNameTest() {
-        ResponseEntity<ResponseModel> response = personInfoRestController.getMedicalRecordFromFirstNameAndLastName("Jacob", "Boyd");
+        ResponseEntity<List<ResponseModel>> response = personInfoRestController.getMedicalRecordFromFirstNameAndLastName("Jacob", "Boyd");
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertNotNull(response.getBody());
-        Assertions.assertEquals(1, response.getBody().size());
+        Assertions.assertEquals(6, response.getBody().size());
     }
 }
