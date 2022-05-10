@@ -88,7 +88,7 @@ class AbstractDaoTest {
     }
 
     @Test
-    void testGetElement() throws DatabaseException {
+    void testGetElement() throws DatabaseException, ElementNotFoundException {
         AbstractModelTestImp model = new AbstractModelTestImp();
         model.setValue("test");
         daoTestImp.create(model);

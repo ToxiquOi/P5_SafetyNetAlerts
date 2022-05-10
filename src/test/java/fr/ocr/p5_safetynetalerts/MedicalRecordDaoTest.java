@@ -40,6 +40,6 @@ class MedicalRecordDaoTest {
 
         Assertions.assertEquals(1, medicalRecordDao.reads(attributes).size());
         medicalRecordDao.deleteByFirstNameAndLastName("Ron", "Peters");
-        Assertions.assertEquals(0, medicalRecordDao.reads(attributes).size());
+        Assertions.assertThrows(ElementNotFoundException.class, () -> medicalRecordDao.reads(attributes));
     }
 }

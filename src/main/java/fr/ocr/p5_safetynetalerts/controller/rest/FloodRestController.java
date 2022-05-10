@@ -39,22 +39,24 @@ public class FloodRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
     @GetMapping( "/stations")
-    public ResponseEntity<ResponseModel> getHomeDependingFromFireStation(@NotNull @RequestParam List<String> stations) {
+    public ResponseEntity<List<ResponseModel>> getHomeDependingFromFireStation(@NotNull @RequestParam List<String> stations) {
         checkIfNotNull(stations);
-        ResponseModel rsModel = new ResponseModel();
 
         Map<String, String> attr = new HashMap<>();
 
+        List<ResponseModel> responseList = new ArrayList<>();
         for (String station : stations) {
             attr.clear();
             attr.put("station", station);
 
-            Map<String, List<ResponseModel>> address = new TreeMap<>();
+            ResponseModel stationResponseModel = new ResponseModel();
+
+            List<ResponseModel> addressListModel = new ArrayList<>();
             for (FirestationModel firestationModel : fireStationDao.reads(attr)) {
                 attr.clear();
                 attr.put("address", firestationModel.getAddress());
 
-                List<ResponseModel> persons = new ArrayList<>();
+                List<ResponseModel> personsRsList = new ArrayList<>();
                 for (PersonModel personModel : personDao.reads(attr)) {
                     attr.clear();
                     attr.put("firstname", personModel.getFirstName());
@@ -69,15 +71,19 @@ public class FloodRestController extends AbstractRestExceptionHandler {
                     personRs.put("phone", personModel.getPhone());
                     personRs.put("allergies", medicalRecordModel.getAllergies());
                     personRs.put("medications", medicalRecordModel.getMedications());
-
-                    persons.add(personRs);
+                    personsRsList.add(personRs);
                 }
 
-                address.put(firestationModel.getAddress(), persons);
+                ResponseModel addressRsModel = new ResponseModel();
+                addressRsModel.put("address", firestationModel.getAddress());
+                addressRsModel.put("persons", personsRsList);
+                addressListModel.add(addressRsModel);
             }
-            rsModel.put(station, address);
+            stationResponseModel.put("station", station);
+            stationResponseModel.put("address", addressListModel);
+            responseList.add(stationResponseModel);
         }
 
-        return ResponseEntity.ok(rsModel);
+        return ResponseEntity.ok(responseList);
     }
 }

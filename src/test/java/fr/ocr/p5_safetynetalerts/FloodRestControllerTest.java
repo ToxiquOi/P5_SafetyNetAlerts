@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
+import java.util.List;
 
 @SpringBootTest
 class FloodRestControllerTest {
@@ -36,7 +37,7 @@ class FloodRestControllerTest {
     void getHomeDependingFromFireStationTest() {
         String[] stations = {"1", "2"};
 
-        ResponseEntity<ResponseModel> response = floodRestController.getHomeDependingFromFireStation(Arrays.stream(stations).toList());
+        ResponseEntity<List<ResponseModel>> response = floodRestController.getHomeDependingFromFireStation(Arrays.stream(stations).toList());
 
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
         Assertions.assertNotNull(response.getBody());
