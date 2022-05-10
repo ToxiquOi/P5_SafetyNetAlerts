@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("alert")
 public class AlertRestController extends AbstractRestExceptionHandler {
 
     private final PersonDao personDao;
@@ -36,7 +35,7 @@ public class AlertRestController extends AbstractRestExceptionHandler {
     }
 
     @SneakyThrows
-    @GetMapping("/child")
+    @GetMapping("childAlert")
     public ResponseEntity<ResponseModel> childAlert(@RequestParam String address) {
         checkIfNotNull(address);
         Map<String, String> attr = new HashMap<>();
@@ -76,7 +75,7 @@ public class AlertRestController extends AbstractRestExceptionHandler {
     }
 
     @SneakyThrows
-    @GetMapping("/phone")
+    @GetMapping("phoneAlert")
     public ResponseEntity<ResponseModel> phoneAlert(@RequestParam String station) {
         checkIfNotNull(station);
         Map<String, String> attr = new HashMap<>();
