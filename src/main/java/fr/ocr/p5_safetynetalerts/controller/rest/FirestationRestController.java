@@ -72,30 +72,29 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
         int nbChild = 0;
 
 
-        for (FirestationModel station : fireStationDao.reads(attr)) {
-            attr.clear();
-            attr.put("address", station.getAddress());
+        FirestationModel station = fireStationDao.reads(attr).get(0);
+        attr.clear();
+        attr.put("address", station.getAddress());
 
-            List<Map<String, String>> persons = new ArrayList<>();
-            for (PersonModel personModel : personDao.reads(attr)) {
-                Map<String, String> person = new TreeMap<>();
-                person.put("lastname", personModel.getLastName());
-                person.put("firstname", personModel.getFirstName());
+        List<Map<String, String>> persons = new ArrayList<>();
+        for (PersonModel personModel : personDao.reads(attr)) {
+            Map<String, String> person = new TreeMap<>();
+            person.put("lastname", personModel.getLastName());
+            person.put("firstname", personModel.getFirstName());
 
-                if (18 <= calculatorService.caculateYearsOld(medicalRecordDao.reads(person).get(0).getBirthdate()))
-                    nbChild++;
-                else
-                    nbAdult++;
+            if (18 <= calculatorService.caculateYearsOld(medicalRecordDao.reads(person).get(0).getBirthdate()))
+                nbChild++;
+            else
+                nbAdult++;
 
-                person.put("phone", personModel.getPhone());
-                persons.add(person);
-            }
-
-            rsModel.put(station.getAddress(), persons);
+            person.put("phone", personModel.getPhone());
+            persons.add(person);
         }
 
+        rsModel.put("persons", persons);
+        rsModel.put("address", station.getAddress());
         rsModel.put("childs", nbChild);
-        rsModel.put("Adults", nbAdult);
+        rsModel.put("adults", nbAdult);
 
         return ResponseEntity.ok(rsModel);
     }
