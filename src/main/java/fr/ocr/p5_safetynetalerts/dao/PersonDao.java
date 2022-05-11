@@ -19,7 +19,7 @@ public class PersonDao extends AbstractDao<PersonModel> {
         super(database, PersonModel.class, "Person");
     }
 
-    public void deleteByFirstNameAndLastName(String firstName, String lastName) throws DatabaseException, ElementNotFoundException {
+    public PersonModel deleteByFirstNameAndLastName(String firstName, String lastName) throws DatabaseException, ElementNotFoundException {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("FirstName", firstName);
         attributes.put("LastName", lastName);
@@ -31,6 +31,6 @@ public class PersonDao extends AbstractDao<PersonModel> {
         }
 
         PersonModel model = personModelList.get(0);
-        delete(model.getId());
+        return delete(model.getId());
     }
 }

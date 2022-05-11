@@ -19,7 +19,7 @@ public class MedicalRecordDao extends AbstractDao<MedicalRecordModel> {
         super(database, MedicalRecordModel.class, "MedicalRecord");
     }
 
-    public void deleteByFirstNameAndLastName(String firstName, String lastName) throws DatabaseException, ElementNotFoundException {
+    public MedicalRecordModel deleteByFirstNameAndLastName(String firstName, String lastName) throws DatabaseException, ElementNotFoundException {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("FirstName", firstName);
         attributes.put("LastName", lastName);
@@ -32,6 +32,6 @@ public class MedicalRecordDao extends AbstractDao<MedicalRecordModel> {
         }
 
         MedicalRecordModel model = personModelList.get(0);
-        delete(model.getId());
+        return delete(model.getId());
     }
 }

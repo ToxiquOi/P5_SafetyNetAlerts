@@ -50,14 +50,10 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
     @DeleteMapping
-    public ResponseEntity<ResponseModel> deleteFirestationMapping(@NotNull @RequestParam String station,
+    public ResponseEntity<FirestationModel> deleteFirestationMapping(@NotNull @RequestParam String station,
                                                             @NotNull @RequestParam String address) {
-        fireStationDao.suppressMapping(station, address);
 
-        ResponseModel response = new ResponseModel();
-        response.put("result", true);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(fireStationDao.suppressMapping(station, address));
     }
 
    @SneakyThrows
@@ -67,35 +63,43 @@ public class FirestationRestController extends AbstractRestExceptionHandler {
         Map<String, String> attr = new HashMap<>();
         attr.put("station", stationNumber);
 
-        ResponseModel rsModel = new ResponseModel();
-        int nbAdult = 0;
-        int nbChild = 0;
+       int nbAdult = 0;
+       int nbChild = 0;
 
+        ResponseModel body = new ResponseModel();
 
-        FirestationModel station = fireStationDao.reads(attr).get(0);
-        attr.clear();
-        attr.put("address", station.getAddress());
+        List<ResponseModel> streets = new ArrayList<>();
+        for(FirestationModel station : fireStationDao.reads(attr)) {
+            attr.clear();
+            attr.put("address", station.getAddress());
 
-        List<Map<String, String>> persons = new ArrayList<>();
-        for (PersonModel personModel : personDao.reads(attr)) {
-            Map<String, String> person = new TreeMap<>();
-            person.put("lastname", personModel.getLastName());
-            person.put("firstname", personModel.getFirstName());
+            ResponseModel street = new ResponseModel();
 
-            if (18 <= calculatorService.caculateYearsOld(medicalRecordDao.reads(person).get(0).getBirthdate()))
-                nbChild++;
-            else
-                nbAdult++;
+            List<Map<String, String>> persons = new ArrayList<>();
+            for (PersonModel personModel : personDao.reads(attr)) {
+                Map<String, String> person = new TreeMap<>();
+                person.put("lastname", personModel.getLastName());
+                person.put("firstname", personModel.getFirstName());
 
-            person.put("phone", personModel.getPhone());
-            persons.add(person);
+                if (calculatorService.caculateYearsOld(medicalRecordDao.reads(person).get(0).getBirthdate()) <= 18)
+                    nbChild++;
+                else
+                    nbAdult++;
+
+                person.put("phone", personModel.getPhone());
+                persons.add(person);
+            }
+
+            street.put("persons", persons);
+            street.put("address", station.getAddress());
+            streets.add(street);
         }
 
-        rsModel.put("persons", persons);
-        rsModel.put("address", station.getAddress());
-        rsModel.put("childs", nbChild);
-        rsModel.put("adults", nbAdult);
+        body.put("stations", stationNumber);
+        body.put("streets", streets);
+        body.put("childs", nbChild);
+        body.put("adults", nbAdult);
 
-        return ResponseEntity.ok(rsModel);
+        return ResponseEntity.ok(body);
     }
 }

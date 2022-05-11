@@ -38,14 +38,9 @@ public class PersonRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
     @DeleteMapping
-    public ResponseEntity<ResponseModel> deletePerson(@NotNull @RequestParam(name = "FirstName") String firstname,
+    public ResponseEntity<PersonModel> deletePerson(@NotNull @RequestParam(name = "FirstName") String firstname,
                                                       @NotNull @RequestParam(name = "LastName") String lastname) {
         checkIfNotNull(firstname, lastname);
-        personDao.deleteByFirstNameAndLastName(firstname, lastname);
-
-        ResponseModel response = new ResponseModel();
-        response.put("result", true);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(personDao.deleteByFirstNameAndLastName(firstname, lastname));
     }
 }

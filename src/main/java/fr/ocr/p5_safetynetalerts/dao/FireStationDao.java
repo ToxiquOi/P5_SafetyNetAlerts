@@ -19,7 +19,7 @@ public class FireStationDao extends AbstractDao<FirestationModel> {
         super(database, FirestationModel.class, "Firestation");
     }
 
-    public void suppressMapping(String station, String address) throws DatabaseException, ElementNotFoundException {
+    public FirestationModel suppressMapping(String station, String address) throws DatabaseException, ElementNotFoundException {
         Map<String, String> attributes = new HashMap<>();
         attributes.put("station", station);
         attributes.put("address", address);
@@ -31,6 +31,6 @@ public class FireStationDao extends AbstractDao<FirestationModel> {
         }
 
         FirestationModel model = firestationModels.get(0);
-        delete(model.getId());
+        return delete(model.getId());
     }
 }

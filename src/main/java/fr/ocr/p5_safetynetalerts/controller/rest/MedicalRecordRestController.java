@@ -37,14 +37,9 @@ public class MedicalRecordRestController extends AbstractRestExceptionHandler {
 
     @SneakyThrows
     @DeleteMapping
-    public ResponseEntity<ResponseModel> deleteMedicalRecord(@RequestParam(name = "FirstName") String firstname,
+    public ResponseEntity<MedicalRecordModel> deleteMedicalRecord(@RequestParam(name = "FirstName") String firstname,
                                                     @RequestParam(name = "LastName") String lastname) {
         checkIfNotNull(firstname, lastname);
-        medicalRecordDao.deleteByFirstNameAndLastName(firstname, lastname);
-
-        ResponseModel response = new ResponseModel();
-        response.put("result", true);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(medicalRecordDao.deleteByFirstNameAndLastName(firstname, lastname));
     }
 }

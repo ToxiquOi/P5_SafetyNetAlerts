@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +36,16 @@ public class CommunityEmailRestController extends AbstractRestExceptionHandler {
         ResponseModel rsModel = new ResponseModel();
 
         // Fill contents ResponseModel
-        persons.forEach(personModel ->
-                rsModel.put(personModel.getLastName() + " " + personModel.getFirstName(), personModel.getPhone())
-        );
+       List<ResponseModel> personMails = new ArrayList<>();
+       persons.forEach(personModel -> {
+            ResponseModel person = new ResponseModel();
+            person.put("fullname", personModel.getLastName() + " " + personModel.getFirstName());
+            person.put("email", personModel.getEmail());
+            personMails.add(person);
+        });
+
+       rsModel.put("city", cityName);
+       rsModel.put("mails", personMails);
 
         return ResponseEntity.ok(rsModel);
     }
