@@ -84,7 +84,7 @@ class AbstractDaoTest {
 
     @Test
     void testDeleteThrowElementNotFound() {
-        Assertions.assertThrows(ElementNotFoundException.class, () -> daoTestImp.delete(1));
+        Assertions.assertThrows(ElementNotFoundException.class, () -> daoTestImp.delete(2));
     }
 
     @Test

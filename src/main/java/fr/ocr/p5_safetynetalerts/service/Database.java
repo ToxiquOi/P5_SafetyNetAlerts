@@ -144,11 +144,11 @@ public class Database {
      * @return true if element was supressed, false if the element not exist
      * @throws DatabaseException if DB table not exist
      */
-    public <T extends AbstractModel> T deleteElementById(Class<T> c, int id) throws DatabaseException {
+    public <T extends AbstractModel> Optional<T> deleteElementById(Class<T> c, int id) throws DatabaseException {
         if(!data.containsKey(c)) throw new DatabaseException("Table not exist");
         Optional<AbstractModel> optional = data.get(c).stream().filter(m -> m.getId() == id).findFirst();
         optional.ifPresent(model -> data.get(c).remove(model));
-        return (T) optional.get();
+        return (Optional<T>) optional;
     }
 
     public <T extends AbstractModel> int countElementInTable(Class<T> c) throws DatabaseException {

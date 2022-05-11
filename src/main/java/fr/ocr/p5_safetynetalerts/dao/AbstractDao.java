@@ -51,9 +51,9 @@ public abstract class AbstractDao<T extends AbstractModel> {
     }
 
     public T delete(int id) throws DatabaseException, ElementNotFoundException {
-        T result = database.deleteElementById(cModel, id);
-        if(result == null)
+        Optional<T> result = database.deleteElementById(cModel, id);
+        if(result.isEmpty())
             throw new ElementNotFoundException(StringUtils.capitalize(entityName) + "with id: " + id + ", not found in database");
-        return result;
+        return result.get();
     }
 }
