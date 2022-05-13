@@ -53,7 +53,7 @@ public class AlertRestController extends AbstractRestExceptionHandler {
             attr.put("firstname", personModel.getFirstName());
 
             MedicalRecordModel medicalRecord = medicalRecordDao.reads(attr).get(0);
-            if (18 > calculatorService.caculateYearsOld(medicalRecord.getBirthdate())) {
+            if (calculatorService.caculateYearsOld(medicalRecord.getBirthdate()) <= 18) {
 
                 ResponseModel child = new ResponseModel();
                 child.put("firstName", personModel.getFirstName());
